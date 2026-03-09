@@ -1,7 +1,26 @@
-import { eq } from "drizzle-orm";
+import { eq, and, lt, gte, desc, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users } from "../drizzle/schema";
-import { ENV } from './_core/env';
+import {
+  InsertUser,
+  users,
+  investorGoals,
+  portfolioHoldings,
+  portfolioCapital,
+  taxHarvestOpportunities,
+  tradeSuggestions,
+  tradeDecisions,
+  dailyAnalytics,
+  portfolioGreeks,
+  InvestorGoals,
+  PortfolioHoldings,
+  PortfolioCapital,
+  TaxHarvestOpportunities,
+  TradeSuggestions,
+  TradeDecisions,
+  DailyAnalytics,
+  PortfolioGreeks,
+} from "../drizzle/schema";
+import { ENV } from "./_core/env";
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
@@ -56,8 +75,8 @@ export async function upsertUser(user: InsertUser): Promise<void> {
       values.role = user.role;
       updateSet.role = user.role;
     } else if (user.openId === ENV.ownerOpenId) {
-      values.role = 'admin';
-      updateSet.role = 'admin';
+      values.role = "admin";
+      updateSet.role = "admin";
     }
 
     if (!values.lastSignedIn) {
@@ -84,9 +103,249 @@ export async function getUserByOpenId(openId: string) {
     return undefined;
   }
 
-  const result = await db.select().from(users).where(eq(users.openId, openId)).limit(1);
+  const result = await db
+    .select()
+    .from(users)
+    .where(eq(users.openId, openId))
+    .limit(1);
 
   return result.length > 0 ? result[0] : undefined;
 }
 
-// TODO: add feature queries here as your schema grows.
+// Portfolio queries
+
+export async function getInvestorGoals(userId: number): Promise<InvestorGoals | undefined> {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db
+    .select()
+    .from(investorGoals)
+    .where(eq(investorGoals.userId, userId))
+    .limit(1);
+
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function upsertInvestorGoals(userId: number, data: Omit<InvestorGoals, "id" | "createdAt" | "updatedAt" | "userId">) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const existing = await getInvestorGoals(userId);
+
+  if (existing) {
+    await db
+      .update(investorGoals)
+      .set(data)
+      .where(eq(investorGoals.userId, userId));
+  } else {
+    await db.insert(investorGoals).values({
+      ...data,
+      userId,
+    });
+  }
+}
+
+export async function getPortfolioHoldings(userId: number): Promise<PortfolioHoldings[]> {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db
+    .select()
+    .from(portfolioHoldings)
+    .where(eq(portfolioHoldings.userId, userId));
+}
+
+export async function upsertPortfolioHolding(userId: number, holding: Omit<PortfolioHoldings, "id" | "userId" | "createdAt" | "updatedAt">) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const existing = await db
+    .select()
+    .from(portfolioHoldings)
+    .where(and(eq(portfolioHoldings.userId, userId), eq(portfolioHoldings.ticker, holding.ticker)))
+    .limit(1);
+
+  if (existing.length > 0) {
+    await db
+      .update(portfolioHoldings)
+      .set(holding)
+      .where(and(eq(portfolioHoldings.userId, userId), eq(portfolioHoldings.ticker, holding.ticker)));
+  } else {
+    await db.insert(portfolioHoldings).values({
+      ...holding,
+      userId,
+    });
+  }
+}
+
+export async function getPortfolioCapital(userId: number): Promise<PortfolioCapital | undefined> {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db
+    .select()
+    .from(portfolioCapital)
+    .where(eq(portfolioCapital.userId, userId))
+    .limit(1);
+
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function upsertPortfolioCapital(userId: number, data: Omit<PortfolioCapital, "id" | "userId" | "createdAt" | "lastUpdated">) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const existing = await getPortfolioCapital(userId);
+
+  if (existing) {
+    await db
+      .update(portfolioCapital)
+      .set(data)
+      .where(eq(portfolioCapital.userId, userId));
+  } else {
+    await db.insert(portfolioCapital).values({
+      ...data,
+      userId,
+    });
+  }
+}
+
+export async function getTaxHarvestOpportunities(userId: number): Promise<TaxHarvestOpportunities[]> {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db
+    .select()
+    .from(taxHarvestOpportunities)
+    .where(eq(taxHarvestOpportunities.userId, userId))
+    .orderBy(desc(taxHarvestOpportunities.estimatedTaxSavings));
+}
+
+export async function upsertTaxHarvestOpportunity(userId: number, opportunity: Omit<TaxHarvestOpportunities, "id" | "userId" | "createdAt">) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const existing = await db
+    .select()
+    .from(taxHarvestOpportunities)
+    .where(and(eq(taxHarvestOpportunities.userId, userId), eq(taxHarvestOpportunities.ticker, opportunity.ticker)))
+    .limit(1);
+
+  if (existing.length > 0) {
+    await db
+      .update(taxHarvestOpportunities)
+      .set(opportunity)
+      .where(and(eq(taxHarvestOpportunities.userId, userId), eq(taxHarvestOpportunities.ticker, opportunity.ticker)));
+  } else {
+    await db.insert(taxHarvestOpportunities).values({
+      ...opportunity,
+      userId,
+    });
+  }
+}
+
+export async function getTradeSuggestions(userId: number): Promise<TradeSuggestions[]> {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db
+    .select()
+    .from(tradeSuggestions)
+    .where(eq(tradeSuggestions.userId, userId))
+    .orderBy(desc(tradeSuggestions.annualizedYield));
+}
+
+export async function insertTradeSuggestion(userId: number, suggestion: Omit<TradeSuggestions, "id" | "userId" | "createdAt">) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const result = await db.insert(tradeSuggestions).values({
+    ...suggestion,
+    userId,
+  });
+
+  return result;
+}
+
+export async function getTradeDecisions(userId: number): Promise<TradeDecisions[]> {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db
+    .select()
+    .from(tradeDecisions)
+    .where(eq(tradeDecisions.userId, userId))
+    .orderBy(desc(tradeDecisions.createdAt));
+}
+
+export async function upsertTradeDecision(userId: number, decision: Omit<TradeDecisions, "id" | "userId" | "createdAt" | "updatedAt">) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const existing = await db
+    .select()
+    .from(tradeDecisions)
+    .where(and(eq(tradeDecisions.userId, userId), eq(tradeDecisions.ticker, decision.ticker)))
+    .limit(1);
+
+  if (existing.length > 0) {
+    await db
+      .update(tradeDecisions)
+      .set(decision)
+      .where(and(eq(tradeDecisions.userId, userId), eq(tradeDecisions.ticker, decision.ticker)));
+  } else {
+    await db.insert(tradeDecisions).values({
+      ...decision,
+      userId,
+    });
+  }
+}
+
+export async function getDailyAnalytics(userId: number, days: number = 30): Promise<DailyAnalytics[]> {
+  const db = await getDb();
+  if (!db) return [];
+
+  const startDate = new Date();
+  startDate.setDate(startDate.getDate() - days);
+
+  return await db
+    .select()
+    .from(dailyAnalytics)
+    .where(and(eq(dailyAnalytics.userId, userId), gte(dailyAnalytics.date, startDate)))
+    .orderBy(desc(dailyAnalytics.date));
+}
+
+export async function insertDailyAnalytics(userId: number, analytics: Omit<DailyAnalytics, "id" | "userId" | "createdAt">) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  return await db.insert(dailyAnalytics).values({
+    ...analytics,
+    userId,
+  });
+}
+
+export async function getPortfolioGreeks(userId: number): Promise<PortfolioGreeks | undefined> {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db
+    .select()
+    .from(portfolioGreeks)
+    .where(eq(portfolioGreeks.userId, userId))
+    .orderBy(desc(portfolioGreeks.date))
+    .limit(1);
+
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function insertPortfolioGreeks(userId: number, greeks: Omit<PortfolioGreeks, "id" | "userId" | "createdAt">) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  return await db.insert(portfolioGreeks).values({
+    ...greeks,
+    userId,
+  });
+}

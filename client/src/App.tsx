@@ -5,12 +5,33 @@ import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
+import GoalSetup from "./pages/GoalSetup";
+import PortfolioUpload from "./pages/PortfolioUpload";
+import Dashboard from "./pages/Dashboard";
+import { useAuth } from "./_core/hooks/useAuth";
+import { Loader2 } from "lucide-react";
 
 function Router() {
-  // make sure to consider if you need authentication for certain routes
+  const { isAuthenticated, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
   return (
     <Switch>
       <Route path={"/"} component={Home} />
+      {isAuthenticated && (
+        <>
+          <Route path={"/dashboard"} component={Dashboard} />
+          <Route path={"/setup"} component={GoalSetup} />
+          <Route path={"/upload"} component={PortfolioUpload} />
+        </>
+      )}
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
@@ -18,10 +39,8 @@ function Router() {
   );
 }
 
-// NOTE: About Theme
-// - First choose a default theme according to your design style (dark or light bg), than change color palette in index.css
-//   to keep consistent foreground/background color across components
-// - If you want to make theme switchable, pass `switchable` ThemeProvider and use `useTheme` hook
+// Theme: Light mode with elegant color palette
+// Colors: Deep indigo primary, warm gold secondary, emerald accent
 
 function App() {
   return (
