@@ -23,7 +23,8 @@ export const appRouter = router({
   portfolio: router({
     // Get or create investor goals
     getGoals: protectedProcedure.query(async ({ ctx }) => {
-      return await db.getInvestorGoals(ctx.user.id);
+      const goals = await db.getInvestorGoals(ctx.user.id);
+      return goals || null;
     }),
 
     // Set investor goals
@@ -79,7 +80,8 @@ export const appRouter = router({
 
     // Get portfolio capital
     getCapital: protectedProcedure.query(async ({ ctx }) => {
-      return await db.getPortfolioCapital(ctx.user.id);
+      const capital = await db.getPortfolioCapital(ctx.user.id);
+      return capital || null;
     }),
 
     // Update portfolio capital

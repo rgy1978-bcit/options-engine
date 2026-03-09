@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -20,23 +20,23 @@ export default function Dashboard() {
   const decisionsQuery = trpc.trades.getDecisions.useQuery();
   const analyticsQuery = trpc.analytics.getDailyAnalytics.useQuery({ days: 30 });
 
-  const goals = goalsQuery.data;
+  const goals = goalsQuery.data || null;
   const holdings = holdingsQuery.data || [];
-  const capital = capitalQuery.data;
-  const analysis = analysisQuery.data;
+  const capital = capitalQuery.data || null;
+  const analysis = analysisQuery.data || null;
   const taxOpportunities = taxHarvestQuery.data || [];
   const suggestions = suggestionsQuery.data || [];
   const decisions = decisionsQuery.data || [];
   const analytics = analyticsQuery.data || [];
 
   // Calculate metrics
-  const portfolioValue = analysis?.totalValue || 0;
-  const unrealizedGains = analysis?.unrealizedGains || 0;
-  const monthlyGoal = goals?.monthlyIncomeGoal || 0;
-  const availableCash = capital?.availableCash || 0;
+  const portfolioValue = analysis?.totalValue ?? 0;
+  const unrealizedGains = analysis?.unrealizedGains ?? 0;
+  const monthlyGoal = goals?.monthlyIncomeGoal ?? 0;
+  const availableCash = capital?.availableCash ?? 0;
 
   // Mock estimated monthly income (in production, calculate from open positions)
-  const estimatedMonthlyIncome = suggestions.reduce((sum, s) => sum + s.potentialMonthlyIncome, 0) / 100;
+  const estimatedMonthlyIncome = (suggestions || []).reduce((sum, s) => sum + (s?.potentialMonthlyIncome ?? 0), 0) / 100;
   const progressPercent = monthlyGoal > 0 ? (estimatedMonthlyIncome / monthlyGoal) * 100 : 0;
 
   // Prepare chart data
