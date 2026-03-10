@@ -23,6 +23,9 @@
 - [x] Build portfolio status display
 - [x] Build income goal tracker
 - [x] Build elegant home page
+- [x] Add portfolio template download feature
+- [x] Add manual investment entry form in setup
+- [x] Add Excel file upload support
 
 ## Phase 4: Frontend - Analysis & Scanning
 - [x] Build tax harvest opportunities display
