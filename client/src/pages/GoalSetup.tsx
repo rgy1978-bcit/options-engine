@@ -8,6 +8,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { ChevronRight, CheckCircle } from "lucide-react";
+import { useLocation } from "wouter";
 
 type Step = "income" | "risk" | "strategies" | "capital" | "horizon" | "review";
 
@@ -47,6 +48,8 @@ export default function GoalSetup() {
     }
   };
 
+  const [, setLocation] = useLocation();
+
   const handleSubmit = async () => {
     try {
       await setGoalsMutation.mutateAsync({
@@ -57,6 +60,8 @@ export default function GoalSetup() {
         timeHorizon: formData.timeHorizon,
       });
       toast.success("Goals saved successfully!");
+      // Navigate to dashboard after successful setup
+      setLocation("/dashboard");
     } catch (error) {
       toast.error("Failed to save goals");
     }
