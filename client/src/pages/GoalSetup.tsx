@@ -124,14 +124,25 @@ export default function GoalSetup() {
       header: true,
       skipEmptyLines: true,
       complete: (results: any) => {
-        const parsedHoldings = results.data.map((row: any) => ({
-          ticker: row.Ticker?.toUpperCase() || "",
-          shares: parseFloat(row.Shares) || 0,
-          averageCost: parseFloat(row["Average Cost"]) || 0,
-          currentPrice: parseFloat(row["Current Price"]) || 0,
-          purchaseDate: row["Purchase Date"] || "",
-          sector: row.Sector || "",
-        }));
+        const parsedHoldings = results.data.map((row: any) => {
+          // Support both old format (Ticker, Current Price) and new format (Ticker_Symbol)
+          const ticker = (row.Ticker_Symbol || row.Ticker || "").toUpperCase();
+          const shares = parseFloat(row.Shares) || 0;
+          const averageCost = parseFloat(row.Average_Cost || row["Average Cost"]) || 0;
+          
+          // For new format: use Average_Cost as currentPrice if not provided
+          // For old format: use Current Price
+          const currentPrice = parseFloat(row["Current Price"]) || averageCost || 0;
+          
+          return {
+            ticker,
+            shares,
+            averageCost,
+            currentPrice,
+            purchaseDate: row.Purchase_Date || row["Purchase Date"] || "",
+            sector: row.Sector || "",
+          };
+        });
 
         const validHoldings = parsedHoldings.filter((h: PortfolioHolding) => h.ticker && h.shares > 0);
         if (validHoldings.length > 0) {

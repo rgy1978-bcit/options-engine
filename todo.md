@@ -42,6 +42,8 @@
 - [ ] Build win rate analysis charts
 
 ## Phase 6: Testing & Polish
+- [ ] Fix sign-in auth callback error
+- [x] Update CSV template to support stock and options data
 - [ ] Write vitest tests for backend logic
 - [ ] Write vitest tests for frontend components
 - [ ] Test CSV upload and parsing
