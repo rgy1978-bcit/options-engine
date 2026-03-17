@@ -50,9 +50,9 @@
   --sidebar-primary: oklch(0.42 0.16 140);
   --sidebar-primary-foreground: oklch(1 0 0);
   
-  /* Secondary - Luxurious gold for premium accents */
-  --secondary: oklch(0.7 0.22 75);        /* Rich gold - prosperity, premium feel */
-  --secondary-foreground: oklch(0.15 0.01 0);
+  /* Secondary - Sophisticated slate blue for premium accents */
+  --secondary: oklch(0.48 0.14 260);       /* Deep slate blue - sophistication, trust */
+  --secondary-foreground: oklch(1 0 0);
   
   /* Accent - Vibrant emerald for gains & positive indicators */
   --accent: oklch(0.64 0.2 145);          /* Bright emerald green - profit, growth, gains */
@@ -60,7 +60,7 @@
   
   /* Chart colors - money-themed palette */
   --chart-1: oklch(0.42 0.16 140);        /* Forest green - primary data */
-  --chart-2: oklch(0.7 0.22 75);          /* Gold - secondary data */
+  --chart-2: oklch(0.48 0.14 260);        /* Slate blue - secondary data */
   --chart-3: oklch(0.64 0.2 145);         /* Emerald - positive/gains */
   --chart-4: oklch(0.58 0.2 25);          /* Deep red - losses */
   --chart-5: oklch(0.52 0.15 200);        /* Deep blue - neutral/other */
@@ -93,14 +93,14 @@
   --sidebar-primary: oklch(0.55 0.18 140);
   --sidebar-primary-foreground: oklch(0.98 0.002 140);
   
-  --secondary: oklch(0.75 0.22 75);       /* Brighter gold for dark mode */
-  --secondary-foreground: oklch(0.12 0.01 140);
+  --secondary: oklch(0.62 0.15 260);      /* Lighter slate blue for dark mode */
+  --secondary-foreground: oklch(0.98 0.002 140);
   
   --accent: oklch(0.72 0.2 145);          /* Brighter emerald for dark mode */
   --accent-foreground: oklch(0.12 0.01 140);
   
   --chart-1: oklch(0.55 0.18 140);
-  --chart-2: oklch(0.75 0.22 75);
+  --chart-2: oklch(0.62 0.15 260);
   --chart-3: oklch(0.72 0.2 145);
   --chart-4: oklch(0.65 0.2 25);
   --chart-5: oklch(0.6 0.15 200);
