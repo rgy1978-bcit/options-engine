@@ -128,19 +128,19 @@ export default function Home() {
             </div>
 
             <div className="pt-8 border-t border-border">
-              <p className="text-sm text-muted-foreground mb-4">Trusted by sophisticated investors</p>
+              <p className="text-sm text-muted-foreground mb-4">Built for income investors at any stage</p>
               <div className="flex gap-6 text-sm font-medium text-foreground">
                 <div>
-                  <p className="text-2xl font-bold text-primary">1000+</p>
-                  <p className="text-muted-foreground">Active Users</p>
+                  <p className="text-2xl font-bold text-primary">Start Small</p>
+                  <p className="text-muted-foreground">Works with any portfolio size</p>
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-secondary">$500M+</p>
-                  <p className="text-muted-foreground">Assets Managed</p>
+                  <p className="text-2xl font-bold text-secondary">Learn Fast</p>
+                  <p className="text-muted-foreground">AI-powered guidance included</p>
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-accent">12%</p>
-                  <p className="text-muted-foreground">Avg Annual Return</p>
+                  <p className="text-2xl font-bold text-accent">Scale Up</p>
+                  <p className="text-muted-foreground">Grow your income strategy</p>
                 </div>
               </div>
             </div>
