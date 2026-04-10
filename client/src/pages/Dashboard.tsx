@@ -145,28 +145,19 @@ export default function Dashboard() {
 
         {/* Tabs */}
         <div className="flex gap-2 mb-6 border-b border-border overflow-x-auto">
-          {["overview", "portfolio", "opportunities", "decisions", "research"].map((tab) => {
-            const tabIcons: Record<string, any> = {
-              overview: "📊",
-              portfolio: "💼",
-              opportunities: "⚡",
-              decisions: "📋",
-              research: "📚",
-            };
-            return (
-              <button
-                key={tab}
-                onClick={() => setSelectedTab(tab as any)}
-                className={`px-4 py-2 font-medium transition-colors whitespace-nowrap ${
-                  selectedTab === tab
-                    ? "text-primary border-b-2 border-primary"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                {tabIcons[tab]} {tab.charAt(0).toUpperCase() + tab.slice(1)}
-              </button>
-            );
-          })}
+          {["overview", "portfolio", "opportunities", "decisions", "research"].map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setSelectedTab(tab as any)}
+              className={`px-4 py-2 font-medium transition-colors whitespace-nowrap ${
+                selectedTab === tab
+                  ? "text-primary border-b-2 border-primary"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {tab.charAt(0).toUpperCase() + tab.slice(1)}
+            </button>
+          ))}
         </div>
 
         {/* Tab Content */}
