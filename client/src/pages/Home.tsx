@@ -51,7 +51,7 @@ export default function Home() {
             <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
               <TrendingUp className="h-5 w-5 text-white" />
             </div>
-            <span className="text-xl font-bold gradient-text">Income Engine</span>
+            <span className="text-xl font-bold gradient-text">OptionsProf</span>
           </div>
           {isAuthenticated ? (
             <Button
@@ -84,7 +84,7 @@ export default function Home() {
                 From Your Portfolio
               </h1>
               <p className="text-xl text-muted-foreground max-w-lg">
-                Income Engine is a sophisticated platform for managing options income strategies. Analyze your portfolio, identify opportunities, and track performance with elegant precision.
+                OptionsProf is a sophisticated platform for managing options income strategies. Analyze your portfolio, identify opportunities, and track performance with elegant precision.
               </p>
             </div>
 
