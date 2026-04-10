@@ -5,6 +5,7 @@ import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import * as db from "./db";
 import * as engine from "./portfolioEngine";
+import * as marketData from "./marketData";
 
 export const appRouter = router({
   system: systemRouter,
@@ -259,6 +260,78 @@ export const appRouter = router({
           notes: input.notes || null,
         });
         return { success: true };
+      }),
+  }),
+
+  // Market Data & Live Pricing
+  market: router({
+    // Get live stock quote
+    getQuote: publicProcedure
+      .input(z.object({ symbol: z.string() }))
+      .query(async ({ input }) => {
+        const quote = await marketData.getStockQuote(input.symbol);
+        return quote || null;
+      }),
+
+    // Get multiple stock quotes
+    getQuotes: publicProcedure
+      .input(z.object({ symbols: z.array(z.string()) }))
+      .query(async ({ input }) => {
+        return await marketData.getMultipleQuotes(input.symbols);
+      }),
+
+    // Get options chain for a symbol
+    getOptionsChain: publicProcedure
+      .input(z.object({ symbol: z.string(), expirationDate: z.string().optional() }))
+      .query(async ({ input }) => {
+        const chain = await marketData.getOptionsChain(input.symbol, input.expirationDate);
+        return chain || null;
+      }),
+
+    // Get implied volatility
+    getImpliedVolatility: publicProcedure
+      .input(z.object({ symbol: z.string() }))
+      .query(async ({ input }) => {
+        const iv = await marketData.getImpliedVolatility(input.symbol);
+        return iv || 0;
+      }),
+  }),
+
+  // Broker Connections
+  broker: router({
+    // Get connected brokers for user
+    getConnected: protectedProcedure.query(async ({ ctx }) => {
+      // TODO: Implement broker connection retrieval from database
+      return [];
+    }),
+
+    // Connect a broker account
+    connect: protectedProcedure
+      .input(
+        z.object({
+          brokerType: z.enum(["alpaca", "td-ameritrade", "interactive-brokers", "fidelity"]),
+          authCode: z.string().optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        // TODO: Implement OAuth flow for broker connection
+        return { success: true, message: "Broker connection initiated" };
+      }),
+
+    // Disconnect a broker account
+    disconnect: protectedProcedure
+      .input(z.object({ brokerId: z.string() }))
+      .mutation(async ({ ctx, input }) => {
+        // TODO: Implement broker disconnection
+        return { success: true };
+      }),
+
+    // Sync portfolio from connected broker
+    syncPortfolio: protectedProcedure
+      .input(z.object({ brokerId: z.string() }))
+      .mutation(async ({ ctx, input }) => {
+        // TODO: Implement portfolio sync from broker
+        return { success: true, holdingsUpdated: 0 };
       }),
   }),
 

@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { getLoginUrl } from "@/const";
 import { useLocation } from "wouter";
-import { ArrowRight, TrendingUp, PieChart, Zap, BarChart3, Shield, Lightbulb } from "lucide-react";
+import { ArrowRight, TrendingUp, PieChart, Zap, BarChart3, Shield, Lightbulb, Link2, Zap as ZapIcon } from "lucide-react";
 
 export default function Home() {
   const { isAuthenticated } = useAuth();
@@ -203,6 +203,57 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Broker Connection Section */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <div className="text-center mb-16">
+          <h2 className="text-4xl font-bold mb-4">Connect Your Broker</h2>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            Sync your portfolio automatically and get real-time trade suggestions
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {[
+            { name: "Alpaca", icon: ZapIcon, color: "from-blue-500 to-blue-600" },
+            { name: "TD Ameritrade", icon: Link2, color: "from-orange-500 to-orange-600" },
+            { name: "Interactive Brokers", icon: BarChart3, color: "from-green-500 to-green-600" },
+            { name: "Fidelity", icon: Shield, color: "from-purple-500 to-purple-600" },
+          ].map((broker, idx) => {
+            const Icon = broker.icon;
+            return (
+              <Card key={idx} className="card-elegant group hover:shadow-md transition-all cursor-pointer">
+                <div className="space-y-4 text-center">
+                  <div className={`h-12 w-12 rounded-lg bg-gradient-to-br ${broker.color} flex items-center justify-center mx-auto group-hover:scale-110 transition-transform`}>
+                    <Icon className="h-6 w-6 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold mb-2">{broker.name}</h3>
+                    <p className="text-sm text-muted-foreground mb-4">Connect account</p>
+                    <Button size="sm" variant="outline" className="w-full">
+                      Connect
+                    </Button>
+                  </div>
+                </div>
+              </Card>
+            );
+          })}
+        </div>
+
+        <div className="mt-12 bg-gradient-to-r from-primary/5 to-secondary/5 border border-primary/10 rounded-xl p-8">
+          <div className="flex items-start gap-4">
+            <div className="h-10 w-10 rounded-lg bg-primary/20 flex items-center justify-center flex-shrink-0">
+              <ZapIcon className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <h3 className="text-lg font-bold mb-2">Real-Time Market Data</h3>
+              <p className="text-muted-foreground">
+                OptionsProf connects to live options pricing APIs (Alpaca, Yahoo Finance, YFinance) to provide real-time Greeks, implied volatility, and bid-ask spreads. Get accurate trade suggestions based on current market conditions.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         <div className="relative bg-gradient-to-r from-primary/10 to-secondary/10 border border-primary/20 rounded-2xl p-12 text-center overflow-hidden">
@@ -234,7 +285,7 @@ export default function Home() {
               <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
                 <TrendingUp className="h-5 w-5 text-white" />
               </div>
-              <span className="font-bold">Income Engine</span>
+              <span className="font-bold">OptionsProf</span>
             </div>
             <p className="text-sm text-muted-foreground">
               © 2026 Income Engine. All rights reserved.

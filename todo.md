@@ -41,7 +41,16 @@
 - [x] Build performance metrics dashboard
 - [ ] Build win rate analysis charts
 
-## Phase 6: Testing & Polish
+## Phase 6: API Integration & Broker Connection
+- [x] Integrate Alpaca options pricing API
+- [x] Integrate Yahoo Finance options data
+- [x] Integrate YFinance for market data
+- [x] Create broker connection UI on home page
+- [ ] Add broker OAuth integration (TD Ameritrade, Interactive Brokers)
+- [ ] Auto-sync portfolio from connected brokers
+- [ ] Update trade suggestions with live market data
+
+## Phase 7: Testing & Polish
 - [ ] Fix sign-in auth callback error
 - [x] Update CSV template to support stock and options data
 - [x] Update color scheme to money-themed palette
