@@ -4,11 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
-import { TrendingUp, Target, AlertCircle, DollarSign, PieChart, Activity } from "lucide-react";
+import { TrendingUp, Target, AlertCircle, DollarSign, PieChart, Activity, BookOpen } from "lucide-react";
 import { LineChart, Line, BarChart, Bar, PieChart as RechartsChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 
 export default function Dashboard() {
-  const [selectedTab, setSelectedTab] = useState<"overview" | "portfolio" | "opportunities" | "decisions">("overview");
+  const [selectedTab, setSelectedTab] = useState<"overview" | "portfolio" | "opportunities" | "decisions" | "research">("overview");
 
   // Queries
   const goalsQuery = trpc.portfolio.getGoals.useQuery();
@@ -144,20 +144,29 @@ export default function Dashboard() {
         </Card>
 
         {/* Tabs */}
-        <div className="flex gap-2 mb-6 border-b border-border">
-          {["overview", "portfolio", "opportunities", "decisions"].map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setSelectedTab(tab as any)}
-              className={`px-4 py-2 font-medium transition-colors ${
-                selectedTab === tab
-                  ? "text-primary border-b-2 border-primary"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {tab.charAt(0).toUpperCase() + tab.slice(1)}
-            </button>
-          ))}
+        <div className="flex gap-2 mb-6 border-b border-border overflow-x-auto">
+          {["overview", "portfolio", "opportunities", "decisions", "research"].map((tab) => {
+            const tabIcons: Record<string, any> = {
+              overview: "📊",
+              portfolio: "💼",
+              opportunities: "⚡",
+              decisions: "📋",
+              research: "📚",
+            };
+            return (
+              <button
+                key={tab}
+                onClick={() => setSelectedTab(tab as any)}
+                className={`px-4 py-2 font-medium transition-colors whitespace-nowrap ${
+                  selectedTab === tab
+                    ? "text-primary border-b-2 border-primary"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {tabIcons[tab]} {tab.charAt(0).toUpperCase() + tab.slice(1)}
+              </button>
+            );
+          })}
         </div>
 
         {/* Tab Content */}
@@ -331,6 +340,77 @@ export default function Dashboard() {
                 <p className="text-muted-foreground">No tax harvest opportunities available</p>
               )}
             </Card>
+          </div>
+        )}
+
+        {selectedTab === "research" && (
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[
+                {
+                  title: "Do Iron Condors Beat the S&P 500?",
+                  description: "Comprehensive analysis comparing iron condor returns against traditional index investing over 10 years.",
+                  category: "Strategy Analysis",
+                  readTime: "8 min",
+                  date: "Mar 8, 2024",
+                },
+                {
+                  title: "Best Options Strategies in High Volatility",
+                  description: "Learn which options strategies perform best when market volatility spikes and how to position your portfolio.",
+                  category: "Market Conditions",
+                  readTime: "6 min",
+                  date: "Mar 5, 2024",
+                },
+                {
+                  title: "Theta Decay Income Study",
+                  description: "Deep dive into how theta decay generates consistent income and optimal ways to harvest it across different market conditions.",
+                  category: "Income Generation",
+                  readTime: "10 min",
+                  date: "Mar 1, 2024",
+                },
+                {
+                  title: "Tax-Loss Harvesting with Options",
+                  description: "Strategic guide to using options for tax-loss harvesting while maintaining portfolio exposure.",
+                  category: "Tax Strategy",
+                  readTime: "7 min",
+                  date: "Feb 28, 2024",
+                },
+                {
+                  title: "Covered Calls vs Cash-Secured Puts",
+                  description: "Detailed comparison of two popular income strategies and when to use each based on market outlook.",
+                  category: "Strategy Comparison",
+                  readTime: "9 min",
+                  date: "Feb 25, 2024",
+                },
+                {
+                  title: "Managing Risk in Income Portfolios",
+                  description: "Essential risk management techniques for options income traders to protect capital during market downturns.",
+                  category: "Risk Management",
+                  readTime: "8 min",
+                  date: "Feb 22, 2024",
+                },
+              ].map((article, idx) => (
+                <Card key={idx} className="card-elegant hover:shadow-lg transition-shadow cursor-pointer group">
+                  <div className="flex flex-col h-full">
+                    <div className="mb-3">
+                      <span className="inline-block px-3 py-1 bg-primary/10 text-primary text-xs font-semibold rounded-full">
+                        {article.category}
+                      </span>
+                    </div>
+                    <h3 className="text-lg font-bold mb-2 group-hover:text-primary transition-colors">
+                      {article.title}
+                    </h3>
+                    <p className="text-sm text-muted-foreground mb-4 flex-grow">
+                      {article.description}
+                    </p>
+                    <div className="flex items-center justify-between text-xs text-muted-foreground border-t border-border pt-3">
+                      <span>{article.readTime} read</span>
+                      <span>{article.date}</span>
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
           </div>
         )}
 
