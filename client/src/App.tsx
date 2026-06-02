@@ -10,6 +10,7 @@ import PortfolioUpload from "./pages/PortfolioUpload";
 import Dashboard from "./pages/Dashboard";
 import { useAuth } from "./_core/hooks/useAuth";
 import { Loader2 } from "lucide-react";
+import Login from "./pages/Login";
 
 function Router() {
   const { isAuthenticated, loading } = useAuth();
@@ -25,6 +26,8 @@ function Router() {
   return (
     <Switch>
       <Route path={"/"} component={Home} />
+      <Route path={"/login"} component={Login} />
+      
       {isAuthenticated && (
         <>
           <Route path={"/dashboard"} component={Dashboard} />

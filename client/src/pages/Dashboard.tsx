@@ -1,3 +1,4 @@
+import DashboardLayout from "@/components/DashboardLayout";
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -61,14 +62,15 @@ export default function Dashboard() {
   const COLORS = ["#3b82f6", "#f59e0b", "#10b981", "#ef4444", "#8b5cf6"];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-muted p-6">
+   <DashboardLayout>
+   <div className="min-h-screen bg-gradient-to-br from-background to-muted p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-4xl font-bold gradient-text mb-2">OptionsProf Dashboard</h1>
           <p className="text-muted-foreground">Monitor your options income strategy in real-time</p>
         </div>
-
+       
         {/* Key Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <Card className="card-elegant">
@@ -447,5 +449,6 @@ export default function Dashboard() {
         )}
       </div>
     </div>
+    </DashboardLayout>
   );
 }

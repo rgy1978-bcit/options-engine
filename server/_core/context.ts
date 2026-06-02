@@ -1,6 +1,8 @@
 import type { CreateExpressContextOptions } from "@trpc/server/adapters/express";
 import type { User } from "../../drizzle/schema";
-import { sdk } from "./sdk";
+import * as db from "../db";
+import { ENV } from "./env";
+import { createClient } from "@supabase/supabase-js";
 
 export type TrpcContext = {
   req: CreateExpressContextOptions["req"];
@@ -8,15 +10,47 @@ export type TrpcContext = {
   user: User | null;
 };
 
+const supabaseAdmin = createClient(
+  ENV.supabaseUrl,
+  ENV.supabaseServiceRoleKey
+);
+
 export async function createContext(
   opts: CreateExpressContextOptions
 ): Promise<TrpcContext> {
   let user: User | null = null;
 
   try {
-    user = await sdk.authenticateRequest(opts.req);
+    const authHeader = opts.req.headers.authorization;
+    if (authHeader?.startsWith("Bearer ")) {
+      const token = authHeader.slice(7);
+
+      const { data: { user: supabaseUser }, error } =
+        await supabaseAdmin.auth.getUser(token);
+
+      if (!error && supabaseUser) {
+        // Find or create user in our DB
+        user = await db.getUserByOpenId(supabaseUser.id);
+
+        if (!user) {
+          await db.upsertUser({
+            openId: supabaseUser.id,
+            email: supabaseUser.email ?? null,
+            name: supabaseUser.user_metadata?.name ?? null,
+            loginMethod: "email",
+            lastSignedIn: new Date(),
+          });
+          user = await db.getUserByOpenId(supabaseUser.id);
+        } else {
+          await db.upsertUser({
+            openId: supabaseUser.id,
+            lastSignedIn: new Date(),
+          });
+        }
+      }
+    }
   } catch (error) {
-    // Authentication is optional for public procedures.
+    console.warn("[Auth] Failed to authenticate request:", error);
     user = null;
   }
 

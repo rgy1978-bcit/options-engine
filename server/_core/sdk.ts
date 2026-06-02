@@ -6,6 +6,7 @@ import type { Request } from "express";
 import { SignJWT, jwtVerify } from "jose";
 import type { User } from "../../drizzle/schema";
 import * as db from "../db";
+import * as slack from "../services/slack";
 import { ENV } from "./env";
 import type {
   ExchangeTokenRequest,
@@ -281,9 +282,11 @@ class SDKServer {
           loginMethod: userInfo.loginMethod ?? userInfo.platform ?? null,
           lastSignedIn: signedInAt,
         });
+        slack.notifyNewUser(userInfo.email ?? "unknown");
         user = await db.getUserByOpenId(userInfo.openId);
       } catch (error) {
         console.error("[Auth] Failed to sync user from OAuth:", error);
+        slack.notifyError(String(error), "Auth user sync");
         throw ForbiddenError("Failed to sync user info");
       }
     }
