@@ -4,6 +4,7 @@ import { supabase } from "@/lib/supabase";
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
@@ -21,10 +22,17 @@ export default function Login() {
         });
         if (error) throw error;
         setSuccess("Password reset email sent! Check your inbox.");
+      } else if (isSignUp) {
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: { data: { full_name: name } },
+        });
+        if (error) throw error;
+        setSuccess("Account created! You can now sign in.");
+        setIsSignUp(false);
       } else {
-        const { error } = isSignUp
-          ? await supabase.auth.signUp({ email, password })
-          : await supabase.auth.signInWithPassword({ email, password });
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         window.location.href = "/dashboard";
       }
@@ -33,6 +41,25 @@ export default function Login() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleGoogleSignIn = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: `${window.location.origin}/dashboard` },
+    });
+    if (error) setError(error.message);
+  };
+
+  const handleMicrosoftSignIn = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "azure",
+      options: { 
+        scopes: "email",
+        redirectTo: `${window.location.origin}/dashboard` 
+      },
+    });
+    if (error) setError(error.message);
   };
 
   return (
@@ -46,6 +73,40 @@ export default function Login() {
         )}
         {success && (
           <div className="bg-green-50 text-green-700 p-3 rounded-lg mb-4 text-sm">{success}</div>
+        )}
+
+        {!isForgotPassword && (
+          <>
+            <button
+              onClick={handleGoogleSignIn}
+              className="w-full flex items-center justify-center gap-3 border border-gray-300 rounded-lg p-3 mb-4 hover:bg-gray-50 transition font-medium text-gray-700"
+            >
+              <img src="https://www.google.com/favicon.ico" alt="Google" className="w-5 h-5" />
+              Continue with Google
+            </button>
+            <button
+  onClick={handleMicrosoftSignIn}
+  className="w-full flex items-center justify-center gap-3 border border-gray-300 rounded-lg p-3 mb-4 hover:bg-gray-50 transition font-medium text-gray-700"
+>
+  <img src="https://www.microsoft.com/favicon.ico" alt="Microsoft" className="w-5 h-5" />
+  Continue with Microsoft
+</button>
+            <div className="flex items-center gap-3 mb-4">
+              <hr className="flex-1 border-gray-200" />
+              <span className="text-sm text-gray-400">or</span>
+              <hr className="flex-1 border-gray-200" />
+            </div>
+          </>
+        )}
+
+        {isSignUp && (
+          <input
+            type="text"
+            placeholder="Full Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="w-full border border-gray-300 rounded-lg p-3 mb-3 focus:outline-none focus:ring-2 focus:ring-green-500"
+          />
         )}
         <input
           type="email"
@@ -73,7 +134,7 @@ export default function Login() {
         {!isForgotPassword && (
           <>
             <button
-              onClick={() => { setIsSignUp(!isSignUp); setError(""); }}
+              onClick={() => { setIsSignUp(!isSignUp); setError(""); setSuccess(""); }}
               className="w-full mt-3 text-green-700 text-sm hover:underline"
             >
               {isSignUp ? "Already have an account? Sign In" : "Don't have an account? Sign Up"}

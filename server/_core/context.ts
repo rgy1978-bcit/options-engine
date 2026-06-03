@@ -22,15 +22,20 @@ export async function createContext(
 
   try {
     const authHeader = opts.req.headers.authorization;
+    console.log("[Auth] Authorization header:", authHeader ? "present" : "missing");
+
     if (authHeader?.startsWith("Bearer ")) {
       const token = authHeader.slice(7);
+      console.log("[Auth] Token length:", token.length);
 
       const { data: { user: supabaseUser }, error } =
         await supabaseAdmin.auth.getUser(token);
 
+      console.log("[Auth] Supabase user:", supabaseUser?.id ?? "null", "Error:", error?.message ?? "none");
+
       if (!error && supabaseUser) {
-        // Find or create user in our DB
         user = await db.getUserByOpenId(supabaseUser.id);
+        console.log("[Auth] DB user found:", user?.id ?? "null");
 
         if (!user) {
           await db.upsertUser({
@@ -41,6 +46,7 @@ export async function createContext(
             lastSignedIn: new Date(),
           });
           user = await db.getUserByOpenId(supabaseUser.id);
+          console.log("[Auth] New user created:", user?.id ?? "null");
         } else {
           await db.upsertUser({
             openId: supabaseUser.id,
@@ -53,6 +59,8 @@ export async function createContext(
     console.warn("[Auth] Failed to authenticate request:", error);
     user = null;
   }
+
+  console.log("[Auth] Final user:", user?.id ?? "null");
 
   return {
     req: opts.req,

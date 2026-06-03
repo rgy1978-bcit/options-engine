@@ -261,7 +261,31 @@ export const appRouter = router({
         });
         return { success: true };
       }),
-  }),
+      createDecision: protectedProcedure
+      .input(
+        z.object({
+          tradeSuggestionId: z.number(),
+          ticker: z.string(),
+          strategy: z.string(),
+          status: z.enum(["accepted", "rejected", "under_consideration", "executed"]),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        await db.upsertTradeDecision(ctx.user.id, {
+          ticker: input.ticker,
+          strategy: input.strategy,
+          status: input.status,
+          tradeSuggestionId: input.tradeSuggestionId,
+          executionPrice: null,
+          executionDate: null,
+          actualPremium: null,
+          outcome: null,
+          profitLoss: null,
+          notes: null,
+        });
+        return { success: true };
+      }),
+    }),
 
   // Market Data & Live Pricing
   market: router({
