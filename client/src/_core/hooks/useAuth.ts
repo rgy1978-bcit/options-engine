@@ -54,6 +54,7 @@ export function useAuth(options?: UseAuthOptions) {
     await supabase.auth.signOut();
     setUser(null);
     setSession(null);
+    window.location.replace("/login");
   }, []);
 
   return {

@@ -22,6 +22,8 @@ import {
 } from "../drizzle/schema";
 import { ENV } from "./_core/env";
 
+console.log("[DB] DATABASE_URL user:", process.env.DATABASE_URL?.split('@')[0]?.split(':')[1] ? "has-password" : "no-password", "host:", process.env.DATABASE_URL?.split('@')[1]?.split('/')[0]);
+
 let _db: ReturnType<typeof drizzle> | null = null;
 
 // Lazily create the drizzle instance so local tooling can run without a DB.
@@ -87,7 +89,8 @@ export async function upsertUser(user: InsertUser): Promise<void> {
       updateSet.lastSignedIn = new Date();
     }
 
-    await db.insert(users).values(values).onDuplicateKeyUpdate({
+    await db.insert(users).values(values).onConflictDoUpdate({
+      target: users.openId,
       set: updateSet,
     });
   } catch (error) {
