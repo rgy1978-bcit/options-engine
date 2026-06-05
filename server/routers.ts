@@ -3,6 +3,7 @@ import { z } from "zod";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
+import { TRPCError } from "@trpc/server";
 import * as db from "./db";
 import * as engine from "./portfolioEngine";
 import * as marketData from "./marketData";
@@ -399,7 +400,70 @@ export const appRouter = router({
         });
         return { success: true };
       }),
-  }),
-});
+}),
 
-export type AppRouter = typeof appRouter;
+  // AI Router with usage limits
+  ai: router({
+    checkUsage: protectedProcedure.query(async ({ ctx }) => {
+      const usage = await db.getAiUsageToday(ctx.user.id);
+      return { callCount: usage, limit: 20, remaining: Math.max(0, 20 - usage) };
+    }),
+
+    askPortfolioQuestion: protectedProcedure
+      .input(z.object({ question: z.string() }))
+      .mutation(async ({ ctx, input }) => {
+        const usage = await db.checkAndIncrementAiUsage(ctx.user.id, 20);
+        if (!usage.allowed) {
+          throw new TRPCError({
+            code: "TOO_MANY_REQUESTS",
+            message: `Daily AI limit reached (${usage.limit} calls/day). Resets at midnight.`,
+          });
+        }
+
+        const { callGemini } = await import("./services/gemini");
+        const holdings = await db.getPortfolioHoldings(ctx.user.id);
+        const goals = await db.getInvestorGoals(ctx.user.id);
+
+        const context = `
+You are an options trading advisor for OptionsProf. 
+User portfolio: ${JSON.stringify(holdings.slice(0, 10))}
+User goals: ${JSON.stringify(goals)}
+Answer concisely in 2-3 sentences.
+        `.trim();
+
+        const answer = await callGemini(input.question, context);
+        return { answer, callsUsed: usage.callCount, callsRemaining: usage.limit - usage.callCount };
+      }),
+
+    analyzeWithAi: protectedProcedure.mutation(async ({ ctx }) => {
+      const usage = await db.checkAndIncrementAiUsage(ctx.user.id, 20);
+      if (!usage.allowed) {
+        throw new TRPCError({
+          code: "TOO_MANY_REQUESTS",
+          message: `Daily AI limit reached (${usage.limit} calls/day). Resets at midnight.`,
+        });
+      }
+
+      const { callGemini } = await import("./services/gemini");
+      const holdings = await db.getPortfolioHoldings(ctx.user.id);
+      const goals = await db.getInvestorGoals(ctx.user.id);
+
+      const prompt = `
+Analyze this options portfolio and suggest 3 income-generating trades.
+Holdings: ${JSON.stringify(holdings.slice(0, 10))}
+Monthly income goal: $${(goals?.monthlyIncomeGoal ?? 0) / 100}
+Return JSON: { "summary": "...", "suggestions": [{ "ticker": "...", "strategy": "...", "reasoning": "..." }] }
+      `.trim();
+
+      const response = await callGemini(prompt);
+      try {
+        const clean = response.replace(/```json|```/g, "").trim();
+        const parsed = JSON.parse(clean);
+        return { ...parsed, callsUsed: usage.callCount, callsRemaining: usage.limit - usage.callCount };
+      } catch {
+        return { summary: response, suggestions: [], callsUsed: usage.callCount, callsRemaining: usage.limit - usage.callCount };
+      }
+    }),
+  }),
+  });
+  export type AppRouter = typeof appRouter;

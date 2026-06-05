@@ -146,3 +146,13 @@ export const portfolioGreeks = pgTable("portfolioGreeks", {
 
 export type PortfolioGreeks = typeof portfolioGreeks.$inferSelect;
 export type InsertPortfolioGreeks = typeof portfolioGreeks.$inferInsert;
+
+export const aiUsage = pgTable("aiUsage", {
+  id: serial("id").primaryKey(),
+  userId: integer("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  date: varchar("date", { length: 10 }).notNull(),
+  callCount: integer("callCount").notNull().default(0),
+});
+
+export type AiUsage = typeof aiUsage.$inferSelect;
+export type InsertAiUsage = typeof aiUsage.$inferInsert;
