@@ -1,3 +1,4 @@
+import ws from "ws";
 import type { CreateExpressContextOptions } from "@trpc/server/adapters/express";
 import type { User } from "../../drizzle/schema";
 import * as db from "../db";
@@ -12,7 +13,12 @@ export type TrpcContext = {
 
 const supabaseAdmin = createClient(
   ENV.supabaseUrl,
-  ENV.supabaseServiceRoleKey
+  ENV.supabaseServiceRoleKey,
+  {
+    realtime: {
+      transport: ws
+    }
+  }
 );
 
 export async function createContext(
