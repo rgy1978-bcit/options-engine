@@ -1,4 +1,3 @@
-import ws from "ws";
 import type { CreateExpressContextOptions } from "@trpc/server/adapters/express";
 import type { User } from "../../drizzle/schema";
 import * as db from "../db";
@@ -15,8 +14,14 @@ const supabaseAdmin = createClient(
   ENV.supabaseUrl,
   ENV.supabaseServiceRoleKey,
   {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false
+    },
     realtime: {
-      transport: ws
+      params: {
+        eventsPerSecond: 0
+      }
     }
   }
 );
