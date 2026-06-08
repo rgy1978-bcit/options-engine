@@ -10,4 +10,6 @@ export const ENV = {
   slackWebhookUrl: process.env.SLACK_WEBHOOK_URL ?? "",
   supabaseUrl: process.env.SUPABASE_URL ?? "",
   supabaseServiceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY ?? "",
+  geminiApiKey: process.env.GEMINI_API_KEY ?? "",
+  fmpApiKey: process.env.FMP_API_KEY ?? "",
 };

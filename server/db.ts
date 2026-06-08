@@ -11,6 +11,7 @@ import {
   tradeDecisions,
   dailyAnalytics,
   portfolioGreeks,
+  aiUsage,
   InvestorGoals,
   PortfolioHoldings,
   PortfolioCapital,
@@ -351,4 +352,51 @@ export async function insertPortfolioGreeks(userId: number, greeks: Omit<Portfol
     ...greeks,
     userId,
   });
+}
+export async function checkAndIncrementAiUsage(userId: number, dailyLimit: number = 20): Promise<{ allowed: boolean; callCount: number; limit: number }> {
+  const db = await getDb();
+  if (!db) return { allowed: false, callCount: 0, limit: dailyLimit };
+
+  const today = new Date().toISOString().split('T')[0];
+
+  // Get or create today's usage record
+  const existing = await db
+    .select()
+    .from(aiUsage)
+    .where(and(eq(aiUsage.userId, userId), eq(aiUsage.date, today)))
+    .limit(1);
+
+  if (existing.length === 0) {
+    // First call today
+    await db.insert(aiUsage).values({ userId, date: today, callCount: 1 });
+    return { allowed: true, callCount: 1, limit: dailyLimit };
+  }
+
+  const current = existing[0].callCount;
+
+  if (current >= dailyLimit) {
+    return { allowed: false, callCount: current, limit: dailyLimit };
+  }
+
+  // Increment counter
+  await db
+    .update(aiUsage)
+    .set({ callCount: current + 1 })
+    .where(and(eq(aiUsage.userId, userId), eq(aiUsage.date, today)));
+
+  return { allowed: true, callCount: current + 1, limit: dailyLimit };
+}
+
+export async function getAiUsageToday(userId: number): Promise<number> {
+  const db = await getDb();
+  if (!db) return 0;
+
+  const today = new Date().toISOString().split('T')[0];
+  const result = await db
+    .select()
+    .from(aiUsage)
+    .where(and(eq(aiUsage.userId, userId), eq(aiUsage.date, today)))
+    .limit(1);
+
+  return result.length > 0 ? result[0].callCount : 0;
 }
