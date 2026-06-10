@@ -27,8 +27,8 @@ export default function Home() {
   const features = [
     {
       icon: TrendingUp,
-      title: "Smart Income Generation",
-      description: "Generate consistent monthly income through strategic options trading with AI-powered recommendations",
+      title: "PremiaOpts",
+      description: "AI-powered options income strategies for serious investors and learners",
     },
     {
       icon: PieChart,
