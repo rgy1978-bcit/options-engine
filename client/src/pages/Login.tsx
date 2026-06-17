@@ -66,7 +66,7 @@ export default function Login() {
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
       <div className="bg-white p-8 rounded-xl shadow-md w-full max-w-md">
         <h1 className="text-2xl font-bold text-green-700 mb-6">
-          {isForgotPassword ? "Reset Password" : isSignUp ? "Create Account" : "Sign In to OptionsProf"}
+          {isForgotPassword ? "Reset Password" : isSignUp ? "Create Account" : "Sign In to PremiaOpts"}
         </h1>
         {error && (
           <div className="bg-red-50 text-red-600 p-3 rounded-lg mb-4 text-sm">{error}</div>
