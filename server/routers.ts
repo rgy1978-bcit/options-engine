@@ -425,7 +425,7 @@ export const appRouter = router({
         const goals = await db.getInvestorGoals(ctx.user.id);
 
         const context = `
-You are an options trading advisor for OptionsProf. 
+You are an options trading advisor for PremiaOpts.
 User portfolio: ${JSON.stringify(holdings.slice(0, 10))}
 User goals: ${JSON.stringify(goals)}
 Answer concisely in 2-3 sentences.

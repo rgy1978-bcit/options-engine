@@ -67,7 +67,7 @@ export default function Dashboard() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold gradient-text mb-2">OptionsProf Dashboard</h1>
+          <h1 className="text-4xl font-bold gradient-text mb-2">PremiaOpts Dashboard</h1>
           <p className="text-muted-foreground">Monitor your options income strategy in real-time</p>
         </div>
        

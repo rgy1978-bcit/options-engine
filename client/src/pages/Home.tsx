@@ -11,13 +11,12 @@ import {
   BarChart3,
   Shield,
   Lightbulb,
-  Link2,
   CheckCircle,
-  AlertCircle,
   Briefcase,
   DollarSign,
   LineChart,
   Target,
+  AlertCircle,
 } from "lucide-react";
 
 export default function Home() {
@@ -59,23 +58,23 @@ export default function Home() {
 
   const requirements = [
     {
-      title: "Brokerage Account",
-      description: "Open an account with a supported broker (Alpaca, TD Ameritrade, Interactive Brokers, Fidelity)",
+      title: "Your Brokerage Account",
+      description: "Use your existing account at any broker that supports options (Schwab, Fidelity, TD Ameritrade, etc.) — no new account needed",
       icon: Briefcase,
     },
     {
       title: "Options Trading Approval",
-      description: "Enable options trading (Level 1 minimum for covered calls and cash-secured puts)",
+      description: "Enable options trading at your broker (Level 1 minimum for covered calls and cash-secured puts)",
       icon: CheckCircle,
     },
     {
-      title: "Minimum Capital",
-      description: "$5,000-$10,000 to start with flexibility across multiple positions",
+      title: "Available Capital",
+      description: "$2,500–$10,000 minimum in your brokerage depending on your chosen strategy",
       icon: DollarSign,
     },
     {
       title: "Portfolio Holdings",
-      description: "Upload your current stocks and options via CSV or manual entry",
+      description: "Upload your current stocks and options via CSV or manual entry to get personalized suggestions",
       icon: LineChart,
     },
   ];
@@ -111,13 +110,6 @@ export default function Home() {
     },
   ];
 
-  const brokers = [
-    { name: "Alpaca", icon: Zap, color: "from-blue-500 to-blue-600" },
-    { name: "TD Ameritrade", icon: Link2, color: "from-orange-500 to-orange-600" },
-    { name: "Interactive Brokers", icon: BarChart3, color: "from-green-500 to-green-600" },
-    { name: "Fidelity", icon: Shield, color: "from-purple-500 to-purple-600" },
-  ];
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted">
       {/* Navigation */}
@@ -127,7 +119,7 @@ export default function Home() {
             <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
               <TrendingUp className="h-5 w-5 text-white" />
             </div>
-            <span className="text-xl font-bold gradient-text">OptionsProf</span>
+            <span className="text-xl font-bold gradient-text">PremiaOpts</span>
           </div>
           {isAuthenticated ? (
             <Button
@@ -160,7 +152,7 @@ export default function Home() {
                 From Your Portfolio
               </h1>
               <p className="text-xl text-muted-foreground max-w-lg">
-                OptionsProf is a sophisticated platform for managing options income strategies. Analyze your portfolio, identify opportunities, and track performance with elegant precision.
+                PremiaOpts is an AI-powered options income advisor. Get expert trade suggestions, analyze your portfolio, and make informed decisions — then execute in your own brokerage account.
               </p>
             </div>
 
@@ -207,8 +199,8 @@ export default function Home() {
               <p className="text-sm text-muted-foreground mb-4">Built for income investors at any stage</p>
               <div className="flex gap-6 text-sm font-medium text-foreground">
                 <div>
-                  <p className="text-2xl font-bold text-primary">Start Small</p>
-                  <p className="text-muted-foreground">Works with any portfolio size</p>
+                  <p className="text-2xl font-bold text-primary">Advisory</p>
+                  <p className="text-muted-foreground">You keep full control</p>
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-secondary">Learn Fast</p>
@@ -255,7 +247,7 @@ export default function Home() {
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold mb-4">What You Need to Get Started</h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            OptionsProf works best when you have these essentials in place
+            PremiaOpts is advisory-only — trade in your own brokerage, no new accounts required
           </p>
         </div>
 
@@ -282,71 +274,13 @@ export default function Home() {
           <div className="flex items-start gap-4">
             <AlertCircle className="h-6 w-6 text-primary flex-shrink-0 mt-1" />
             <div>
-              <h3 className="text-lg font-bold mb-2">Minimum Capital Requirements</h3>
+              <h3 className="text-lg font-bold mb-2">Typical Capital Requirements by Strategy</h3>
               <ul className="space-y-2 text-muted-foreground">
-                <li>• <strong>Covered Calls:</strong> $2,500-$5,000 (to own 100 shares)</li>
-                <li>• <strong>Cash-Secured Puts:</strong> $2,500-$10,000 (to secure the put)</li>
-                <li>• <strong>Iron Condors:</strong> $5,000-$10,000 (for margin requirements)</li>
+                <li>• <strong>Covered Calls:</strong> $2,500–$5,000 (to own 100 shares)</li>
+                <li>• <strong>Cash-Secured Puts:</strong> $2,500–$10,000 (to secure the put)</li>
+                <li>• <strong>Iron Condors:</strong> $5,000–$10,000 (for margin requirements)</li>
                 <li>• <strong>Recommended Starting:</strong> $10,000+ for portfolio flexibility</li>
               </ul>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Broker Integration Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 border-t border-border">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold mb-4">Connect Your Broker</h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Sync your portfolio automatically and get real-time trade suggestions
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {brokers.map((broker, idx) => {
-            const Icon = broker.icon;
-            return (
-              <Card key={idx} className="card-elegant group hover:shadow-md transition-all cursor-pointer">
-                <div className="space-y-4 text-center">
-                  <div className={`h-12 w-12 rounded-lg bg-gradient-to-br ${broker.color} flex items-center justify-center mx-auto group-hover:scale-110 transition-transform`}>
-                    <Icon className="h-6 w-6 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-bold mb-2">{broker.name}</h3>
-                    <p className="text-sm text-muted-foreground mb-4">Connect account</p>
-                    <Button size="sm" variant="outline" className="w-full">
-                      Connect
-                    </Button>
-                  </div>
-                </div>
-              </Card>
-            );
-          })}
-        </div>
-
-        <div className="mt-12 bg-gradient-to-r from-primary/5 to-secondary/5 border border-primary/10 rounded-xl p-8">
-          <div className="flex items-start gap-4">
-            <Zap className="h-6 w-6 text-primary flex-shrink-0 mt-1" />
-            <div>
-              <h3 className="text-lg font-bold mb-2">Real-Time Market Data</h3>
-              <p className="text-muted-foreground mb-4">
-                OptionsProf connects to live options pricing APIs (Alpaca, Yahoo Finance, YFinance) to provide real-time Greeks, implied volatility, and bid-ask spreads. Get accurate trade suggestions based on current market conditions.
-              </p>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-                <div className="bg-background/50 rounded-lg p-4">
-                  <p className="text-sm font-bold text-primary">Live Stock Quotes</p>
-                  <p className="text-xs text-muted-foreground mt-1">Real-time bid-ask prices</p>
-                </div>
-                <div className="bg-background/50 rounded-lg p-4">
-                  <p className="text-sm font-bold text-primary">Options Chains</p>
-                  <p className="text-xs text-muted-foreground mt-1">All available expirations & strikes</p>
-                </div>
-                <div className="bg-background/50 rounded-lg p-4">
-                  <p className="text-sm font-bold text-primary">Greeks Calculations</p>
-                  <p className="text-xs text-muted-foreground mt-1">Delta, Gamma, Theta, Vega, Rho</p>
-                </div>
-              </div>
             </div>
           </div>
         </div>
@@ -386,7 +320,7 @@ export default function Home() {
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold mb-4">Supported Options Strategies</h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            OptionsProf supports multiple income-generating strategies with detailed analysis and recommendations
+            PremiaOpts supports multiple income-generating strategies with detailed analysis and recommendations
           </p>
         </div>
 
@@ -425,7 +359,7 @@ export default function Home() {
             <div>
               <h3 className="text-lg font-bold mb-2">Strategy Selection Guide</h3>
               <p className="text-muted-foreground mb-4">
-                OptionsProf analyzes your portfolio and risk tolerance to recommend the best strategies for your situation. Each strategy has different capital requirements, risk profiles, and income potential.
+                PremiaOpts analyzes your portfolio and risk tolerance to recommend the best strategies for your situation. Each strategy has different capital requirements, risk profiles, and income potential.
               </p>
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li>• <strong>Conservative investors:</strong> Start with covered calls and collars</li>
@@ -514,7 +448,7 @@ export default function Home() {
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold mb-4">Getting Started in 5 Steps</h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Start generating income from your portfolio in minutes
+            Start getting expert options income guidance in minutes
           </p>
         </div>
 
@@ -522,20 +456,20 @@ export default function Home() {
           {[
             {
               step: "1",
-              title: "Open a Brokerage Account",
-              description: "Choose a broker (Alpaca, TD Ameritrade, Interactive Brokers, Fidelity) and complete account setup",
-              time: "1-2 days",
+              title: "Have a Brokerage Account",
+              description: "Use any broker that supports options trading (Schwab, Fidelity, TD Ameritrade, etc.) — PremiaOpts is advisory-only, so you trade in your own account",
+              time: "Already done",
             },
             {
               step: "2",
               title: "Enable Options Trading",
-              description: "Request options approval (Level 1 minimum) and fund your account with at least $5,000-$10,000",
-              time: "1-5 days",
+              description: "Request options approval (Level 1 minimum) from your broker if not already enabled, and ensure you have capital available for your chosen strategies",
+              time: "1–5 days",
             },
             {
               step: "3",
-              title: "Create OptionsProf Account",
-              description: "Sign up and connect your broker account to OptionsProf",
+              title: "Create Your PremiaOpts Account",
+              description: "Sign up and complete a quick profile so we can tailor recommendations to your situation",
               time: "5 minutes",
             },
             {
@@ -547,7 +481,7 @@ export default function Home() {
             {
               step: "5",
               title: "Upload Your Portfolio",
-              description: "Add your current holdings via CSV upload or manual entry",
+              description: "Add your current holdings via CSV upload or manual entry to get personalized trade suggestions",
               time: "5 minutes",
             },
           ].map((item, idx) => (
@@ -572,7 +506,7 @@ export default function Home() {
           <div className="relative space-y-6">
             <h2 className="text-4xl font-bold">Ready to Generate Consistent Income?</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Join sophisticated investors using OptionsProf to optimize their options strategies
+              Join investors using PremiaOpts to optimize their options income strategies
             </p>
             {!isAuthenticated && (
               <Button
@@ -580,7 +514,7 @@ export default function Home() {
                 size="lg"
                 className="bg-gradient-to-r from-primary to-secondary hover:opacity-90"
               >
-                Start Free Trial
+                Get Started Free
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             )}
@@ -596,10 +530,10 @@ export default function Home() {
               <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
                 <TrendingUp className="h-5 w-5 text-white" />
               </div>
-              <span className="font-bold">OptionsProf</span>
+              <span className="font-bold">PremiaOpts</span>
             </div>
             <p className="text-sm text-muted-foreground">
-              © 2026 OptionsProf. All rights reserved.
+              © 2026 PremiaOpts. All rights reserved.
             </p>
           </div>
         </div>
