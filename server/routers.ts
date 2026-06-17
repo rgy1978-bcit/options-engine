@@ -19,6 +19,15 @@ export const appRouter = router({
         success: true,
       } as const;
     }),
+    getMode: protectedProcedure.query(({ ctx }) => ({
+      mode: (ctx.user.userMode ?? "pro") as "pro" | "learning",
+    })),
+    setMode: protectedProcedure
+      .input(z.object({ mode: z.enum(["pro", "learning"]) }))
+      .mutation(async ({ ctx, input }) => {
+        await db.updateUserMode(ctx.user.id, input.mode);
+        return { mode: input.mode };
+      }),
   }),
 
   // Portfolio and Goals Management

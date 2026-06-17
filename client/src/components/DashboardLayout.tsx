@@ -4,8 +4,11 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { trpc } from "@/lib/trpc";
 import {
   Sidebar,
   SidebarContent,
@@ -21,7 +24,7 @@ import {
 } from "@/components/ui/sidebar";
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { LayoutDashboard, LogOut, PanelLeft, Users, TrendingUp, Target, Upload } from "lucide-react";
+import { LayoutDashboard, LogOut, PanelLeft, TrendingUp, Target, Upload, GraduationCap, BarChart2 } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
@@ -110,6 +113,11 @@ function DashboardLayoutContent({
 }: DashboardLayoutContentProps) {
   const { user, logout } = useAuth();
   const [location, setLocation] = useLocation();
+  const modeQuery = trpc.auth.getMode.useQuery();
+  const setModeMutation = trpc.auth.setMode.useMutation({
+    onSuccess: () => modeQuery.refetch(),
+  });
+  const currentMode = modeQuery.data?.mode ?? "pro";
   const { state, toggleSidebar } = useSidebar();
   const isCollapsed = state === "collapsed";
   const [isResizing, setIsResizing] = useState(false);
@@ -222,7 +230,31 @@ function DashboardLayoutContent({
                   </div>
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuContent align="end" className="w-52">
+                <DropdownMenuLabel className="text-xs text-muted-foreground font-normal">
+                  {currentMode === "pro" ? "Pro Mode" : "Learning Mode"}
+                </DropdownMenuLabel>
+                <DropdownMenuItem
+                  onClick={() =>
+                    setModeMutation.mutate({
+                      mode: currentMode === "pro" ? "learning" : "pro",
+                    })
+                  }
+                  className="cursor-pointer"
+                  disabled={setModeMutation.isPending}
+                >
+                  {currentMode === "pro" ? (
+                    <GraduationCap className="mr-2 h-4 w-4" />
+                  ) : (
+                    <BarChart2 className="mr-2 h-4 w-4" />
+                  )}
+                  <span>
+                    {currentMode === "pro"
+                      ? "Switch to Learning Mode"
+                      : "Switch to Pro Mode"}
+                  </span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem
                   onClick={logout}
                   className="cursor-pointer text-destructive focus:text-destructive"
