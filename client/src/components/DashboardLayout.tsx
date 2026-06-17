@@ -211,7 +211,50 @@ function DashboardLayoutContent({
             </SidebarMenu>
           </SidebarContent>
 
-          <SidebarFooter className="p-3">
+          <SidebarFooter className="p-3 gap-2">
+            {/* Mode toggle — always visible */}
+            {!isCollapsed ? (
+              <div className="flex items-center gap-1 rounded-lg bg-muted p-1">
+                <button
+                  onClick={() => currentMode !== "pro" && setModeMutation.mutate({ mode: "pro" })}
+                  disabled={setModeMutation.isPending}
+                  className={`flex-1 flex items-center justify-center gap-1.5 text-xs py-1.5 px-2 rounded-md font-medium transition-all ${
+                    currentMode === "pro"
+                      ? "bg-background shadow-sm text-foreground"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <BarChart2 className="h-3.5 w-3.5" />
+                  Pro
+                </button>
+                <button
+                  onClick={() => currentMode !== "learning" && setModeMutation.mutate({ mode: "learning" })}
+                  disabled={setModeMutation.isPending}
+                  className={`flex-1 flex items-center justify-center gap-1.5 text-xs py-1.5 px-2 rounded-md font-medium transition-all ${
+                    currentMode === "learning"
+                      ? "bg-background shadow-sm text-foreground"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <GraduationCap className="h-3.5 w-3.5" />
+                  Learning
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => setModeMutation.mutate({ mode: currentMode === "pro" ? "learning" : "pro" })}
+                disabled={setModeMutation.isPending}
+                title={`Switch to ${currentMode === "pro" ? "Learning" : "Pro"} Mode`}
+                className="h-9 w-9 flex items-center justify-center hover:bg-accent rounded-lg transition-colors mx-auto"
+              >
+                {currentMode === "pro" ? (
+                  <BarChart2 className="h-4 w-4 text-primary" />
+                ) : (
+                  <GraduationCap className="h-4 w-4 text-primary" />
+                )}
+              </button>
+            )}
+
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button className="flex items-center gap-3 rounded-lg px-1 py-1 hover:bg-accent/50 transition-colors w-full text-left group-data-[collapsible=icon]:justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-ring">
@@ -222,7 +265,7 @@ function DashboardLayoutContent({
                   </Avatar>
                   <div className="flex-1 min-w-0 group-data-[collapsible=icon]:hidden">
                     <p className="text-sm font-medium truncate leading-none">
-                    {user?.user_metadata?.full_name || user?.email || "-"} 
+                    {user?.user_metadata?.full_name || user?.email || "-"}
                     </p>
                     <p className="text-xs text-muted-foreground truncate mt-1.5">
                       {user?.email || "-"}
@@ -230,31 +273,7 @@ function DashboardLayoutContent({
                   </div>
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-52">
-                <DropdownMenuLabel className="text-xs text-muted-foreground font-normal">
-                  {currentMode === "pro" ? "Pro Mode" : "Learning Mode"}
-                </DropdownMenuLabel>
-                <DropdownMenuItem
-                  onClick={() =>
-                    setModeMutation.mutate({
-                      mode: currentMode === "pro" ? "learning" : "pro",
-                    })
-                  }
-                  className="cursor-pointer"
-                  disabled={setModeMutation.isPending}
-                >
-                  {currentMode === "pro" ? (
-                    <GraduationCap className="mr-2 h-4 w-4" />
-                  ) : (
-                    <BarChart2 className="mr-2 h-4 w-4" />
-                  )}
-                  <span>
-                    {currentMode === "pro"
-                      ? "Switch to Learning Mode"
-                      : "Switch to Pro Mode"}
-                  </span>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
+              <DropdownMenuContent align="end" className="w-48">
                 <DropdownMenuItem
                   onClick={logout}
                   className="cursor-pointer text-destructive focus:text-destructive"

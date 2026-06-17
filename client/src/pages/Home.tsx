@@ -69,7 +69,7 @@ export default function Home() {
     },
     {
       title: "Available Capital",
-      description: "$2,500–$10,000 minimum in your brokerage depending on your chosen strategy",
+      description: "Start with an amount you're comfortable with — $500 can work for some strategies. PremiaOpts will recommend trades that fit your budget.",
       icon: DollarSign,
     },
     {
@@ -274,12 +274,12 @@ export default function Home() {
           <div className="flex items-start gap-4">
             <AlertCircle className="h-6 w-6 text-primary flex-shrink-0 mt-1" />
             <div>
-              <h3 className="text-lg font-bold mb-2">Typical Capital Requirements by Strategy</h3>
+              <h3 className="text-lg font-bold mb-2">Capital Needed Varies by Strategy</h3>
               <ul className="space-y-2 text-muted-foreground">
-                <li>• <strong>Covered Calls:</strong> $2,500–$5,000 (to own 100 shares)</li>
-                <li>• <strong>Cash-Secured Puts:</strong> $2,500–$10,000 (to secure the put)</li>
-                <li>• <strong>Iron Condors:</strong> $5,000–$10,000 (for margin requirements)</li>
-                <li>• <strong>Recommended Starting:</strong> $10,000+ for portfolio flexibility</li>
+                <li>• <strong>Vertical Spreads:</strong> From ~$100–$500 (your max loss is defined upfront)</li>
+                <li>• <strong>Covered Calls:</strong> Depends on the stock — cheaper stocks mean less capital needed</li>
+                <li>• <strong>Cash-Secured Puts:</strong> Scales with the strike price you choose</li>
+                <li>• <strong>PremiaOpts</strong> tailors suggestions to your available budget — you decide what you're comfortable risking</li>
               </ul>
             </div>
           </div>
