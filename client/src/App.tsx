@@ -12,6 +12,7 @@ import { useAuth } from "./_core/hooks/useAuth";
 import { Loader2 } from "lucide-react";
 import Login from "./pages/Login";
 import Opportunities from "./pages/Opportunities";
+import Tutorials from "./pages/Tutorials";
 
 function Router() {
   const { isAuthenticated, loading } = useAuth();
@@ -35,6 +36,7 @@ function Router() {
           <Route path={"/setup"} component={GoalSetup} />
           <Route path={"/upload"} component={PortfolioUpload} />
           <Route path={"/opportunities"} component={Opportunities} />
+          <Route path={"/tutorials"} component={Tutorials} />
         </>
       )}
       <Route path={"/404"} component={NotFound} />

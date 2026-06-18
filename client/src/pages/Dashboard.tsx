@@ -1,4 +1,6 @@
 import DashboardLayout from "@/components/DashboardLayout";
+import LearningDashboard from "@/components/LearningDashboard";
+import { useUserMode } from "@/hooks/useUserMode";
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,7 +11,16 @@ import { TrendingUp, Target, AlertCircle, DollarSign, PieChart, Activity, BookOp
 import { LineChart, Line, BarChart, Bar, PieChart as RechartsChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 
 export default function Dashboard() {
+  const { isLearning } = useUserMode();
   const [selectedTab, setSelectedTab] = useState<"overview" | "portfolio" | "opportunities" | "decisions" | "research">("overview");
+
+  if (isLearning) {
+    return (
+      <DashboardLayout>
+        <LearningDashboard />
+      </DashboardLayout>
+    );
+  }
 
   // Queries
   const goalsQuery = trpc.portfolio.getGoals.useQuery();
