@@ -116,6 +116,18 @@ export async function getUserByOpenId(openId: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
+export async function updateUserMode(userId: number, mode: "pro" | "learning"): Promise<void> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot update user mode: database not available");
+    return;
+  }
+  await db
+    .update(users)
+    .set({ userMode: mode, updatedAt: new Date() })
+    .where(eq(users.id, userId));
+}
+
 // Portfolio queries
 
 export async function getInvestorGoals(userId: number): Promise<InvestorGoals | undefined> {
