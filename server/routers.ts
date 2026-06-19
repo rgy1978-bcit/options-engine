@@ -411,6 +411,66 @@ export const appRouter = router({
       }),
 }),
 
+  // Discover Router — AI-personalized stock picks for options income
+  discover: router({
+    getAiPicks: protectedProcedure.mutation(async ({ ctx }) => {
+      const usage = await db.checkAndIncrementAiUsage(ctx.user.id, 20);
+      if (!usage.allowed) {
+        throw new TRPCError({
+          code: "TOO_MANY_REQUESTS",
+          message: `Daily AI limit reached (${usage.limit} calls/day). Resets at midnight.`,
+        });
+      }
+
+      const { callGemini } = await import("./services/gemini");
+      const holdings = await db.getPortfolioHoldings(ctx.user.id);
+      const goals = await db.getInvestorGoals(ctx.user.id);
+
+      const existingTickers = holdings.map((h) => h.ticker).join(", ") || "none";
+
+      const prompt = `
+You are an options income advisor. Suggest 6 stocks or ETFs ideal for options income strategies.
+
+User's existing holdings (avoid recommending these): ${existingTickers}
+User's risk tolerance: ${goals?.riskTolerance ?? "balanced"}
+User's monthly income goal: $${(goals?.monthlyIncomeGoal ?? 0) / 100}
+User's preferred strategies: ${goals?.preferredStrategies ?? "any"}
+
+Pick stocks that are great candidates for covered calls, cash-secured puts, or iron condors. Prioritize liquid, well-known names with active options markets.
+
+Return ONLY valid JSON in this exact structure:
+{
+  "picks": [
+    {
+      "ticker": "SPY",
+      "name": "SPDR S&P 500 ETF",
+      "sector": "ETF",
+      "priceRange": "$480–$520",
+      "strategy": "iron_condor",
+      "strategyLabel": "Iron Condors",
+      "reason": "Most liquid options market in the world. Low correlation with individual stocks. Ideal for collecting premium in sideways markets.",
+      "estimatedMonthlyYield": "1–2%",
+      "riskLevel": "Medium",
+      "minCapital": 500
+    }
+  ]
+}
+
+strategy must be one of: covered_call, cash_secured_put, iron_condor.
+Return exactly 6 picks. No markdown, no explanation outside the JSON.
+      `.trim();
+
+      const response = await callGemini(prompt);
+      try {
+        const clean = response.replace(/```json|```/g, "").trim();
+        const parsed = JSON.parse(clean);
+        return { ...parsed, callsUsed: usage.callCount, callsRemaining: usage.limit - usage.callCount };
+      } catch {
+        return { picks: [], summary: response, callsUsed: usage.callCount, callsRemaining: usage.limit - usage.callCount };
+      }
+    }),
+  }),
+
   // AI Router with usage limits
   ai: router({
     checkUsage: protectedProcedure.query(async ({ ctx }) => {
