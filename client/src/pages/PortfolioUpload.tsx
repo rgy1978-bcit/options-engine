@@ -38,13 +38,17 @@ export default function PortfolioUpload() {
       complete: (results: any) => {
         try {
           const holdings: ParsedHolding[] = results.data
+            .filter((row: any) => {
+              const type = row.Type_of_Investment || row.type_of_investment || row.type || "";
+              return type.toLowerCase() !== "option";
+            })
             .map((row: any) => ({
-              ticker: row.ticker?.toUpperCase() || row.TICKER?.toUpperCase() || "",
-              shares: Number(row.shares || row.SHARES || 0),
-              averageCost: Number(row.averageCost || row.AVERAGE_COST || row.cost || 0),
-              currentPrice: Number(row.currentPrice || row.CURRENT_PRICE || row.price || 0),
-              purchaseDate: row.purchaseDate || row.PURCHASE_DATE || "",
-              sector: row.sector || row.SECTOR || "",
+              ticker: (row.ticker || row.TICKER || row.Ticker_Symbol || row.ticker_symbol || "").toUpperCase(),
+              shares: Number(row.shares || row.SHARES || row.Shares || 0),
+              averageCost: Number(row.averageCost || row.AVERAGE_COST || row.Average_Cost || row.average_cost || row.cost || 0),
+              currentPrice: Number(row.currentPrice || row.CURRENT_PRICE || row.Current_Price || row.current_price || row.price || 0),
+              purchaseDate: row.purchaseDate || row.PURCHASE_DATE || row.Purchase_Date || row.purchase_date || "",
+              sector: row.sector || row.SECTOR || row.Sector || "",
             }))
             .filter((h: ParsedHolding) => h.ticker && h.shares > 0);
 
@@ -135,11 +139,18 @@ export default function PortfolioUpload() {
                 <div className="bg-muted/50 border border-border rounded-lg p-4 space-y-2">
                   <p className="text-sm font-semibold text-foreground">CSV Format Required:</p>
                   <code className="text-xs bg-background p-2 rounded block overflow-auto text-muted-foreground">
-                    ticker,shares,averageCost,currentPrice,purchaseDate,sector
+                    ticker,shares,averageCost,currentPrice,<br />purchaseDate,sector
                   </code>
                   <p className="text-xs text-muted-foreground">
-                    Example: AAPL,100,150.50,180.25,2023-01-15,Technology
+                    Example: AAPL,100,150.00,185.50,2023-01-15,Technology
                   </p>
+                  <a
+                    href="/income_engine_template.csv"
+                    download="income_engine_template.csv"
+                    className="inline-block text-xs text-primary underline underline-offset-2 hover:opacity-80"
+                  >
+                    Download template CSV
+                  </a>
                 </div>
 
                 {/* Upload Button */}

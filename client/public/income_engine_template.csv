@@ -1,14 +1,11 @@
-Type_of_Investment,Ticker_Symbol,Shares,Average_Cost,Purchase_Date,Expiration,Strike_Price,Contract_Type(Options)
-Stock,AAPL,100,150.00,2023-01-15,,,
-Stock,MSFT,50,300.00,2023-03-20,,,
-Stock,JNJ,75,160.00,2022-06-10,,,
-Stock,PG,60,140.00,2023-02-28,,,
-Stock,XOM,40,110.00,2022-12-05,,,
-Stock,KO,100,60.00,2023-04-12,,,
-Stock,WMT,45,140.00,2023-05-18,,,
-Stock,MCD,30,280.00,2023-07-22,,,
-Stock,AMZN,25,140.00,2023-08-14,,,
-Stock,GOOGL,15,120.00,2023-09-01,,,
-Option,AAPL,10,2.50,2023-10-01,2024-01-19,180.00,Call
-Option,MSFT,5,1.75,2023-10-05,2024-02-16,400.00,Call
-Option,JNJ,8,0.85,2023-10-10,2024-01-19,165.00,Put
+ticker,shares,averageCost,currentPrice,purchaseDate,sector
+AAPL,100,150.00,185.50,2023-01-15,Technology
+MSFT,50,300.00,415.25,2023-03-20,Technology
+JNJ,75,160.00,155.80,2022-06-10,Healthcare
+PG,60,140.00,161.40,2023-02-28,Consumer Staples
+XOM,40,110.00,115.60,2022-12-05,Energy
+KO,100,60.00,61.20,2023-04-12,Consumer Staples
+WMT,45,140.00,164.75,2023-05-18,Consumer Staples
+MCD,30,280.00,291.30,2023-07-22,Consumer Discretionary
+AMZN,25,140.00,178.90,2023-08-14,Technology
+GOOGL,15,120.00,141.60,2023-09-01,Technology

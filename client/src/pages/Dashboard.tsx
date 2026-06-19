@@ -2,16 +2,17 @@ import DashboardLayout from "@/components/DashboardLayout";
 import LearningDashboard from "@/components/LearningDashboard";
 import { useUserMode } from "@/hooks/useUserMode";
 import { useState } from "react";
+import { useLocation } from "wouter";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { trpc } from "@/lib/trpc";
-import { toast } from "sonner";
-import { TrendingUp, Target, AlertCircle, DollarSign, PieChart, Activity, BookOpen } from "lucide-react";
-import { LineChart, Line, BarChart, Bar, PieChart as RechartsChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { TrendingUp, Target, AlertCircle, DollarSign, Activity, CheckCircle, Upload, ArrowRight } from "lucide-react";
+import { LineChart, Line, BarChart, Bar, PieChart as RechartsChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 export default function Dashboard() {
   const { isLearning } = useUserMode();
+  const [, setLocation] = useLocation();
   const [selectedTab, setSelectedTab] = useState<"overview" | "portfolio" | "opportunities" | "decisions" | "research">("overview");
 
   if (isLearning) {
@@ -156,6 +157,64 @@ export default function Dashboard() {
           </div>
         </Card>
 
+        {/* Getting Started — shown when setup is incomplete */}
+        {(holdings.length === 0 || monthlyGoal === 0) && (
+          <Card className="card-elegant mb-8 border-primary/20 bg-primary/5">
+            <div className="space-y-4">
+              <div>
+                <h2 className="text-lg font-bold mb-0.5">Getting Started</h2>
+                <p className="text-sm text-muted-foreground">Complete these steps to get your first trade suggestions</p>
+              </div>
+              <div className="space-y-2">
+                {[
+                  {
+                    label: "Upload your portfolio",
+                    done: holdings.length > 0,
+                    cta: "Upload CSV",
+                    path: "/upload",
+                    icon: Upload,
+                  },
+                  {
+                    label: "Set your monthly income goal",
+                    done: monthlyGoal > 0,
+                    cta: "Set Goal",
+                    path: "/setup",
+                    icon: Target,
+                  },
+                  {
+                    label: "Review trade suggestions",
+                    done: suggestions.length > 0 && holdings.length > 0,
+                    cta: "View Suggestions",
+                    path: "/opportunities",
+                    icon: TrendingUp,
+                  },
+                ].map((step) => {
+                  const Icon = step.icon;
+                  return (
+                    <div key={step.label} className="flex items-center gap-3 py-1.5">
+                      <CheckCircle className={`h-4 w-4 shrink-0 ${step.done ? "text-accent" : "text-muted-foreground/30"}`} />
+                      <span className={`text-sm flex-1 ${step.done ? "text-foreground line-through decoration-muted-foreground/50" : "text-foreground"}`}>
+                        {step.label}
+                      </span>
+                      {!step.done && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="h-7 text-xs shrink-0"
+                          onClick={() => setLocation(step.path)}
+                        >
+                          {step.cta}
+                          <ArrowRight className="ml-1 h-3 w-3" />
+                        </Button>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </Card>
+        )}
+
         {/* Tabs */}
         <div className="flex gap-2 mb-6 border-b border-border overflow-x-auto">
           {["overview", "portfolio", "opportunities", "decisions", "research"].map((tab) => (
@@ -202,7 +261,12 @@ export default function Dashboard() {
                   </LineChart>
                 </ResponsiveContainer>
               ) : (
-                <div className="h-300 flex items-center justify-center text-muted-foreground">No data available</div>
+                <div className="flex flex-col items-center justify-center h-48 gap-3 text-center">
+                  <p className="text-sm text-muted-foreground">No portfolio history yet</p>
+                  <Button size="sm" variant="outline" onClick={() => setLocation("/upload")}>
+                    <Upload className="mr-1.5 h-3.5 w-3.5" /> Upload Portfolio
+                  </Button>
+                </div>
               )}
             </Card>
 
@@ -226,7 +290,12 @@ export default function Dashboard() {
                   </BarChart>
                 </ResponsiveContainer>
               ) : (
-                <div className="h-300 flex items-center justify-center text-muted-foreground">No data available</div>
+                <div className="flex flex-col items-center justify-center h-48 gap-3 text-center">
+                  <p className="text-sm text-muted-foreground">Upload your portfolio to see concentration analysis</p>
+                  <Button size="sm" variant="outline" onClick={() => setLocation("/upload")}>
+                    <Upload className="mr-1.5 h-3.5 w-3.5" /> Upload Portfolio
+                  </Button>
+                </div>
               )}
             </Card>
           </div>
@@ -264,7 +333,12 @@ export default function Dashboard() {
                   </RechartsChart>
                 </ResponsiveContainer>
               ) : (
-                <div className="h-300 flex items-center justify-center text-muted-foreground">No data available</div>
+                <div className="flex flex-col items-center justify-center h-48 gap-3 text-center">
+                  <p className="text-sm text-muted-foreground">Add sector info in your CSV to see exposure</p>
+                  <Button size="sm" variant="outline" onClick={() => setLocation("/upload")}>
+                    <Upload className="mr-1.5 h-3.5 w-3.5" /> Upload Portfolio
+                  </Button>
+                </div>
               )}
             </Card>
 
@@ -317,7 +391,12 @@ export default function Dashboard() {
                   ))}
                 </div>
               ) : (
-                <p className="text-muted-foreground">No trade suggestions available</p>
+                <div className="flex flex-col items-center gap-3 py-8 text-center">
+                  <p className="text-sm text-muted-foreground">No trade suggestions yet — upload your portfolio first to get AI-generated ideas</p>
+                  <Button size="sm" variant="outline" onClick={() => setLocation("/upload")}>
+                    <Upload className="mr-1.5 h-3.5 w-3.5" /> Upload Portfolio
+                  </Button>
+                </div>
               )}
             </Card>
 
