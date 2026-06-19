@@ -15,15 +15,7 @@ export default function Dashboard() {
   const [, setLocation] = useLocation();
   const [selectedTab, setSelectedTab] = useState<"overview" | "portfolio" | "opportunities" | "decisions" | "research">("overview");
 
-  if (isLearning) {
-    return (
-      <DashboardLayout>
-        <LearningDashboard />
-      </DashboardLayout>
-    );
-  }
-
-  // Queries
+  // All hooks must be called unconditionally before any early return
   const goalsQuery = trpc.portfolio.getGoals.useQuery();
   const holdingsQuery = trpc.portfolio.getHoldings.useQuery();
   const capitalQuery = trpc.portfolio.getCapital.useQuery();
@@ -32,6 +24,14 @@ export default function Dashboard() {
   const suggestionsQuery = trpc.trades.getSuggestions.useQuery();
   const decisionsQuery = trpc.trades.getDecisions.useQuery();
   const analyticsQuery = trpc.analytics.getDailyAnalytics.useQuery({ days: 30 });
+
+  if (isLearning) {
+    return (
+      <DashboardLayout>
+        <LearningDashboard />
+      </DashboardLayout>
+    );
+  }
 
   const goals = goalsQuery.data || null;
   const holdings = holdingsQuery.data || [];
