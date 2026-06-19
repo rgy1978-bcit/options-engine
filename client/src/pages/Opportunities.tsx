@@ -1,4 +1,6 @@
 import DashboardLayout from "@/components/DashboardLayout";
+import LearningOpportunities from "@/components/LearningOpportunities";
+import { useUserMode } from "@/hooks/useUserMode";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -21,10 +23,12 @@ const strategyColors: Record<string, string> = {
 };
 
 export default function Opportunities() {
+  const { isLearning } = useUserMode();
+
+  // All hooks must be called before any early return
   const [filterStrategy, setFilterStrategy] = useState<string>("all");
   const [minYield, setMinYield] = useState<number>(0);
   const [sortBy, setSortBy] = useState<"annualizedYield" | "premium" | "daysToExpiration">("annualizedYield");
-
   const suggestionsQuery = trpc.trades.getSuggestions.useQuery();
   const decideM = trpc.trades.createDecision.useMutation({
     onSuccess: () => suggestionsQuery.refetch(),
@@ -45,6 +49,14 @@ export default function Opportunities() {
   const handleDecision = (suggestionId: number, ticker: string, strategy: string, status: "accepted" | "rejected" | "under_consideration") => {
     decideM.mutate({ tradeSuggestionId: suggestionId, ticker, strategy, status });
   };
+
+  if (isLearning) {
+    return (
+      <DashboardLayout>
+        <LearningOpportunities />
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>
