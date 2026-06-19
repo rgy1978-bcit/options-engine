@@ -109,3 +109,6 @@ temp/
 # Webdev artifacts (checkpoint zips, migrations, etc.)
 .webdev/
 .vercel
+
+# Claude Code internal data
+.claude/
