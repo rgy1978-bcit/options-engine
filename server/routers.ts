@@ -329,6 +329,13 @@ export const appRouter = router({
         const iv = await marketData.getImpliedVolatility(input.symbol);
         return iv || 0;
       }),
+
+    // Get available options expiration dates (FMP)
+    getExpirationDates: publicProcedure
+      .input(z.object({ symbol: z.string() }))
+      .query(async ({ input }) => {
+        return await marketData.getExpirationDates(input.symbol);
+      }),
   }),
 
   // Broker Connections
