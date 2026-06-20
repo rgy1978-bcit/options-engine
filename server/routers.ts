@@ -524,20 +524,83 @@ Answer concisely in 2-3 sentences.
       const holdings = await db.getPortfolioHoldings(ctx.user.id);
       const goals = await db.getInvestorGoals(ctx.user.id);
 
+      const holdingsSummary = holdings.slice(0, 10).map(h => ({
+        ticker: h.ticker,
+        shares: h.shares,
+        currentPrice: h.currentPrice / 100,
+        averageCost: h.averageCost / 100,
+      }));
+
       const prompt = `
-Analyze this options portfolio and suggest 3 income-generating trades.
-Holdings: ${JSON.stringify(holdings.slice(0, 10))}
+You are an options income advisor. Analyze these stock holdings and suggest 3-5 income-generating options trades.
+
+Holdings: ${JSON.stringify(holdingsSummary)}
 Monthly income goal: $${(goals?.monthlyIncomeGoal ?? 0) / 100}
-Return JSON: { "summary": "...", "suggestions": [{ "ticker": "...", "strategy": "...", "reasoning": "..." }] }
+Risk tolerance: ${goals?.riskTolerance ?? "balanced"}
+
+Return ONLY valid JSON (no markdown, no explanation):
+{
+  "summary": "One paragraph summary of the strategy",
+  "suggestions": [
+    {
+      "ticker": "AAPL",
+      "strategy": "covered_call",
+      "strikePrice": 195.00,
+      "premium": 3.50,
+      "daysToExpiration": 30,
+      "delta": "0.30",
+      "annualizedYield": "22.5",
+      "probabilityOfProfit": "70",
+      "potentialMonthlyIncome": 350.00,
+      "expirationDate": "2024-02-16",
+      "reasoning": "Brief explanation"
+    }
+  ]
+}
+
+strategy must be one of: covered_call, cash_secured_put, bull_call_spread, bull_put_spread
+Only suggest covered_call for tickers the user actually holds (at least 100 shares).
+Use realistic current market estimates for strikes and premiums.
       `.trim();
 
       const response = await callGemini(prompt);
       try {
         const clean = response.replace(/```json|```/g, "").trim();
         const parsed = JSON.parse(clean);
-        return { ...parsed, callsUsed: usage.callCount, callsRemaining: usage.limit - usage.callCount };
+        const suggestions = Array.isArray(parsed.suggestions) ? parsed.suggestions : [];
+
+        // Persist each valid suggestion to DB
+        const savedCount = { count: 0 };
+        for (const s of suggestions) {
+          if (!s.ticker || !s.strategy || !s.strikePrice || !s.premium) continue;
+          try {
+            await db.insertTradeSuggestion(ctx.user.id, {
+              ticker: String(s.ticker).toUpperCase(),
+              strategy: s.strategy,
+              strikePrice: Math.round(Number(s.strikePrice) * 100),
+              premium: Math.round(Number(s.premium) * 100),
+              daysToExpiration: Number(s.daysToExpiration) || 30,
+              delta: String(s.delta ?? "0.30"),
+              annualizedYield: String(s.annualizedYield ?? "0"),
+              probabilityOfProfit: String(s.probabilityOfProfit ?? "50"),
+              potentialMonthlyIncome: Math.round(Number(s.potentialMonthlyIncome) * 100),
+              expirationDate: s.expirationDate ? new Date(s.expirationDate) : null,
+            });
+            savedCount.count++;
+          } catch {
+            // Skip invalid suggestions
+          }
+        }
+
+        return {
+          summary: parsed.summary ?? "",
+          suggestions,
+          savedCount: savedCount.count,
+          callsUsed: usage.callCount,
+          callsRemaining: usage.limit - usage.callCount,
+        };
       } catch {
-        return { summary: response, suggestions: [], callsUsed: usage.callCount, callsRemaining: usage.limit - usage.callCount };
+        return { summary: response, suggestions: [], savedCount: 0, callsUsed: usage.callCount, callsRemaining: usage.limit - usage.callCount };
       }
     }),
   }),

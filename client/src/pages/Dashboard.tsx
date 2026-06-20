@@ -7,7 +7,8 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { trpc } from "@/lib/trpc";
-import { TrendingUp, Target, AlertCircle, DollarSign, Activity, CheckCircle, Upload, ArrowRight } from "lucide-react";
+import { TrendingUp, Target, AlertCircle, DollarSign, Activity, CheckCircle, Upload, ArrowRight, Sparkles } from "lucide-react";
+import { toast } from "sonner";
 import { LineChart, Line, BarChart, Bar, PieChart as RechartsChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 export default function Dashboard() {
@@ -23,6 +24,13 @@ export default function Dashboard() {
   const taxHarvestQuery = trpc.analysis.getTaxHarvest.useQuery();
   const suggestionsQuery = trpc.trades.getSuggestions.useQuery();
   const decisionsQuery = trpc.trades.getDecisions.useQuery();
+  const analyzeAiM = trpc.ai.analyzeWithAi.useMutation({
+    onSuccess: (data) => {
+      toast.success(`Generated ${data.savedCount} trade suggestions`);
+      suggestionsQuery.refetch();
+    },
+    onError: (err) => toast.error(err.message),
+  });
   const analyticsQuery = trpc.analytics.getDailyAnalytics.useQuery({ days: 30 });
 
   if (isLearning) {
@@ -392,10 +400,22 @@ export default function Dashboard() {
                 </div>
               ) : (
                 <div className="flex flex-col items-center gap-3 py-8 text-center">
-                  <p className="text-sm text-muted-foreground">No trade suggestions yet — upload your portfolio first to get AI-generated ideas</p>
-                  <Button size="sm" variant="outline" onClick={() => setLocation("/upload")}>
-                    <Upload className="mr-1.5 h-3.5 w-3.5" /> Upload Portfolio
-                  </Button>
+                  <p className="text-sm text-muted-foreground">No trade suggestions yet</p>
+                  {holdings.length === 0 ? (
+                    <Button size="sm" variant="outline" onClick={() => setLocation("/upload")}>
+                      <Upload className="mr-1.5 h-3.5 w-3.5" /> Upload Portfolio First
+                    </Button>
+                  ) : (
+                    <Button
+                      size="sm"
+                      className="bg-green-700 hover:bg-green-800 text-white"
+                      onClick={() => analyzeAiM.mutate()}
+                      disabled={analyzeAiM.isPending}
+                    >
+                      <Sparkles className="mr-1.5 h-3.5 w-3.5" />
+                      {analyzeAiM.isPending ? "Generating..." : "Generate AI Suggestions"}
+                    </Button>
+                  )}
                 </div>
               )}
             </Card>
