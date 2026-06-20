@@ -542,6 +542,7 @@ Answer concisely in 2-3 sentences.
           ? "This is a Traditional IRA. No wash sale rules. Gains are tax-deferred. No margin/naked options allowed."
           : "This is a 401(k). Very limited options strategies. Only covered calls if the plan allows.";
 
+
       const prompt = `
 You are an options income advisor. Analyze these stock holdings and suggest 3-5 income-generating options trades.
 
