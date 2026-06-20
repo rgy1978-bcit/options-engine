@@ -1,4 +1,5 @@
 import { useState } from "react";
+import DashboardLayout from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -92,8 +93,8 @@ export default function PortfolioUpload() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-muted p-6">
-      <div className="max-w-6xl mx-auto">
+    <DashboardLayout>
+    <div className="p-6 max-w-6xl mx-auto">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-4xl font-bold gradient-text mb-2">Upload Portfolio</h1>
@@ -251,6 +252,6 @@ export default function PortfolioUpload() {
           </div>
         </div>
       </div>
-    </div>
+    </DashboardLayout>
   );
 }

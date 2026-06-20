@@ -31,6 +31,7 @@ export const investorGoals = pgTable("investorGoals", {
   preferredStrategies: varchar("preferredStrategies", { length: 255 }).notNull(),
   maxCapitalExposure: integer("maxCapitalExposure").notNull(),
   timeHorizon: varchar("timeHorizon", { length: 64 }).notNull(),
+  accountType: varchar("accountType", { length: 32 }).default("taxable").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().notNull(),
 });

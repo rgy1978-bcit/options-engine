@@ -47,6 +47,7 @@ export const appRouter = router({
           preferredStrategies: z.string(),
           maxCapitalExposure: z.number().positive(),
           timeHorizon: z.string(),
+          accountType: z.enum(["taxable", "traditional_ira", "roth_ira", "401k"]).optional().default("taxable"),
         })
       )
       .mutation(async ({ ctx, input }) => {
@@ -531,12 +532,23 @@ Answer concisely in 2-3 sentences.
         averageCost: h.averageCost / 100,
       }));
 
+      const accountType = goals?.accountType ?? "taxable";
+      const accountNotes =
+        accountType === "taxable"
+          ? "This is a taxable brokerage account. Wash sale rules apply. Premiums are taxed as short-term gains."
+          : accountType === "roth_ira"
+          ? "This is a Roth IRA. No wash sale rules. All gains are tax-free. Conservative strategies preferred."
+          : accountType === "traditional_ira"
+          ? "This is a Traditional IRA. No wash sale rules. Gains are tax-deferred. No margin/naked options allowed."
+          : "This is a 401(k). Very limited options strategies. Only covered calls if the plan allows.";
+
       const prompt = `
 You are an options income advisor. Analyze these stock holdings and suggest 3-5 income-generating options trades.
 
 Holdings: ${JSON.stringify(holdingsSummary)}
 Monthly income goal: $${(goals?.monthlyIncomeGoal ?? 0) / 100}
 Risk tolerance: ${goals?.riskTolerance ?? "balanced"}
+Account type: ${accountType} — ${accountNotes}
 
 Return ONLY valid JSON (no markdown, no explanation):
 {

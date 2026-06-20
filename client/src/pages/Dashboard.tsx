@@ -33,6 +33,12 @@ export default function Dashboard() {
   });
   const analyticsQuery = trpc.analytics.getDailyAnalytics.useQuery({ days: 30 });
 
+  // Redirect new users to setup wizard (runs once goals query resolves with no data)
+  if (!goalsQuery.isLoading && goalsQuery.data === null) {
+    setLocation("/setup");
+    return null;
+  }
+
   if (isLearning) {
     return (
       <DashboardLayout>
