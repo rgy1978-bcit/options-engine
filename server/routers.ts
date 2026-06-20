@@ -414,7 +414,7 @@ export const appRouter = router({
   // Discover Router — AI-personalized stock picks for options income
   discover: router({
     getAiPicks: protectedProcedure.mutation(async ({ ctx }) => {
-      const usage = await db.checkAndIncrementAiUsage(ctx.user.id, 20);
+      const usage = await db.checkAndIncrementAiUsage(ctx.user.id, 30);
       if (!usage.allowed) {
         throw new TRPCError({
           code: "TOO_MANY_REQUESTS",
@@ -475,13 +475,13 @@ Return exactly 6 picks. No markdown, no explanation outside the JSON.
   ai: router({
     checkUsage: protectedProcedure.query(async ({ ctx }) => {
       const usage = await db.getAiUsageToday(ctx.user.id);
-      return { callCount: usage, limit: 20, remaining: Math.max(0, 20 - usage) };
+      return { callCount: usage, limit: 30, remaining: Math.max(0, 30 - usage) };
     }),
 
     askPortfolioQuestion: protectedProcedure
       .input(z.object({ question: z.string() }))
       .mutation(async ({ ctx, input }) => {
-        const usage = await db.checkAndIncrementAiUsage(ctx.user.id, 20);
+        const usage = await db.checkAndIncrementAiUsage(ctx.user.id, 30);
         if (!usage.allowed) {
           throw new TRPCError({
             code: "TOO_MANY_REQUESTS",
@@ -505,7 +505,7 @@ Answer concisely in 2-3 sentences.
       }),
 
     analyzeWithAi: protectedProcedure.mutation(async ({ ctx }) => {
-      const usage = await db.checkAndIncrementAiUsage(ctx.user.id, 20);
+      const usage = await db.checkAndIncrementAiUsage(ctx.user.id, 30);
       if (!usage.allowed) {
         throw new TRPCError({
           code: "TOO_MANY_REQUESTS",
