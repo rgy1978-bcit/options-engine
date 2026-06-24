@@ -365,7 +365,7 @@ export async function insertPortfolioGreeks(userId: number, greeks: Omit<Portfol
     userId,
   });
 }
-export async function checkAndIncrementAiUsage(userId: number, dailyLimit: number = 20): Promise<{ allowed: boolean; callCount: number; limit: number }> {
+export async function checkAndIncrementAiUsage(userId: number, dailyLimit: number = 30): Promise<{ allowed: boolean; callCount: number; limit: number }> {
   const db = await getDb();
   if (!db) return { allowed: false, callCount: 0, limit: dailyLimit };
 
