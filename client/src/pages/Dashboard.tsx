@@ -422,8 +422,8 @@ export default function Dashboard() {
               ) : (
                 <div className="flex flex-col items-center gap-3 py-8 text-center">
                   <p className="text-sm text-muted-foreground">No trade suggestions yet</p>
-                  {holdingsQuery.isLoading || holdings.length === 0 ? (
-                    <Button size="sm" variant="outline" onClick={() => setLocation("/upload")} disabled={holdingsQuery.isLoading}>
+                  {holdings.length === 0 ? (
+                    <Button size="sm" variant="outline" onClick={() => setLocation("/upload")}>
                       <Upload className="mr-1.5 h-3.5 w-3.5" /> Upload Portfolio First
                     </Button>
                   ) : (
