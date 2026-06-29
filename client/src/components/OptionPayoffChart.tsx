@@ -53,7 +53,9 @@ function computeGreeks(deltaN: number, strikePrice: number, daysToExpiration: nu
     (isCall
       ? r * K * Math.exp(-r * T) * normalCdf(d2)
       : -r * K * Math.exp(-r * T) * normalCdf(-d2));
-  const thetaPerDay = theta / 365;
+  // Sellers (short strategies) collect theta; negate so display shows what they earn per day
+  const isShort = strategy === "covered_call" || strategy === "cash_secured_put";
+  const thetaPerDay = (theta / 365) * (isShort ? -1 : 1);
   const vega = S * nd1 * sqrtT * 0.01;
   return {
     gamma: Math.abs(gamma),
@@ -134,7 +136,7 @@ function maxLoss(strategy: string, K: number, P: number): number {
     case "covered_call":   return (K - P) * 100;
     case "cash_secured_put": return (K - P) * 100;
     case "bull_call_spread": return P * 100;
-    case "bull_put_spread":  return (K * 0.05 - P) * 100;
+    case "bull_put_spread":  return Math.max(0, (K * 0.05 - P) * 100);
     default: return P * 100;
   }
 }

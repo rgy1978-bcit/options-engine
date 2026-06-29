@@ -13,6 +13,13 @@ import Papa from "papaparse";
 
 type Step = "account" | "income" | "risk" | "strategies" | "capital" | "horizon" | "portfolio" | "review";
 
+const ACCOUNT_TYPE_LABELS: Record<string, string> = {
+  taxable: "Taxable Brokerage",
+  traditional_ira: "Traditional IRA",
+  roth_ira: "Roth IRA",
+  "401k": "401(k) / Employer Plan",
+};
+
 interface GoalFormData {
   accountType: "taxable" | "traditional_ira" | "roth_ira" | "401k";
   monthlyIncomeGoal: number;
@@ -735,7 +742,7 @@ export default function GoalSetup() {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="p-4 bg-muted/50 rounded-lg">
                     <p className="text-sm text-muted-foreground mb-1">Account Type</p>
-                    <p className="text-lg font-semibold capitalize">{formData.accountType.replace(/_/g, " ")}</p>
+                    <p className="text-lg font-semibold">{ACCOUNT_TYPE_LABELS[formData.accountType]}</p>
                   </div>
                   <div className="p-4 bg-muted/50 rounded-lg">
                     <p className="text-sm text-muted-foreground mb-1">Monthly Income Goal</p>

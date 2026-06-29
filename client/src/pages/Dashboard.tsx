@@ -1,7 +1,7 @@
 import DashboardLayout from "@/components/DashboardLayout";
 import LearningDashboard from "@/components/LearningDashboard";
 import { useUserMode } from "@/hooks/useUserMode";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -33,11 +33,12 @@ export default function Dashboard() {
   });
   const analyticsQuery = trpc.analytics.getDailyAnalytics.useQuery({ days: 30 });
 
-  // Redirect new users to setup wizard (runs once goals query resolves with no data)
-  if (!goalsQuery.isLoading && goalsQuery.data === null) {
-    setLocation("/setup");
-    return null;
-  }
+  // Redirect new users to setup wizard once goals query resolves with no data
+  useEffect(() => {
+    if (!goalsQuery.isLoading && goalsQuery.data === null) {
+      setLocation("/setup");
+    }
+  }, [goalsQuery.isLoading, goalsQuery.data]);
 
   if (isLearning) {
     return (
@@ -62,8 +63,8 @@ export default function Dashboard() {
   const monthlyGoal = goals?.monthlyIncomeGoal ?? 0;
   const availableCash = capital?.availableCash ?? 0;
 
-  // Mock estimated monthly income (in production, calculate from open positions)
-  const estimatedMonthlyIncome = (suggestions || []).reduce((sum, s) => sum + (s?.potentialMonthlyIncome ?? 0), 0) / 100;
+  // getSuggestions already returns potentialMonthlyIncome in dollars
+  const estimatedMonthlyIncome = (suggestions || []).reduce((sum, s) => sum + (s?.potentialMonthlyIncome ?? 0), 0);
   const progressPercent = monthlyGoal > 0 ? (estimatedMonthlyIncome / monthlyGoal) * 100 : 0;
 
   // Prepare chart data
@@ -407,8 +408,8 @@ export default function Dashboard() {
               ) : (
                 <div className="flex flex-col items-center gap-3 py-8 text-center">
                   <p className="text-sm text-muted-foreground">No trade suggestions yet</p>
-                  {holdings.length === 0 ? (
-                    <Button size="sm" variant="outline" onClick={() => setLocation("/upload")}>
+                  {holdingsQuery.isLoading || holdings.length === 0 ? (
+                    <Button size="sm" variant="outline" onClick={() => setLocation("/upload")} disabled={holdingsQuery.isLoading}>
                       <Upload className="mr-1.5 h-3.5 w-3.5" /> Upload Portfolio First
                     </Button>
                   ) : (

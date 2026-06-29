@@ -441,7 +441,7 @@ You are an options income advisor. Suggest 6 stocks or ETFs ideal for options in
 
 User's existing holdings (avoid recommending these): ${existingTickers}
 User's risk tolerance: ${goals?.riskTolerance ?? "balanced"}
-User's monthly income goal: $${(goals?.monthlyIncomeGoal ?? 0) / 100}
+User's monthly income goal: $${goals?.monthlyIncomeGoal ?? 0}
 User's preferred strategies: ${goals?.preferredStrategies ?? "any"}
 
 Pick stocks that are great candidates for covered calls, cash-secured puts, or iron condors. Prioritize liquid, well-known names with active options markets.
@@ -546,7 +546,7 @@ Answer concisely in 2-3 sentences.
 You are an options income advisor. Analyze these stock holdings and suggest 3-5 income-generating options trades.
 
 Holdings: ${JSON.stringify(holdingsSummary)}
-Monthly income goal: $${(goals?.monthlyIncomeGoal ?? 0) / 100}
+Monthly income goal: $${goals?.monthlyIncomeGoal ?? 0}
 Risk tolerance: ${goals?.riskTolerance ?? "balanced"}
 Account type: ${accountType} — ${accountNotes}
 
@@ -581,10 +581,14 @@ Use realistic current market estimates for strikes and premiums.
         const parsed = JSON.parse(clean);
         const suggestions = Array.isArray(parsed.suggestions) ? parsed.suggestions : [];
 
-        // Persist each valid suggestion to DB
-        const savedCount = { count: 0 };
+        // Replace any previous suggestions for this user with the fresh batch
+        await db.clearTradeSuggestions(ctx.user.id);
+
+        let savedCount = 0;
+        const validStrategies = new Set(["covered_call", "cash_secured_put", "bull_call_spread", "bull_put_spread"]);
         for (const s of suggestions) {
-          if (!s.ticker || !s.strategy || !s.strikePrice || !s.premium) continue;
+          if (s.ticker == null || !s.strategy || s.strikePrice == null || s.premium == null) continue;
+          if (!validStrategies.has(s.strategy)) continue;
           try {
             await db.insertTradeSuggestion(ctx.user.id, {
               ticker: String(s.ticker).toUpperCase(),
@@ -598,16 +602,16 @@ Use realistic current market estimates for strikes and premiums.
               potentialMonthlyIncome: Math.round(Number(s.potentialMonthlyIncome) * 100),
               expirationDate: s.expirationDate ? new Date(s.expirationDate) : null,
             });
-            savedCount.count++;
-          } catch {
-            // Skip invalid suggestions
+            savedCount++;
+          } catch (e) {
+            console.error("Failed to save suggestion:", e);
           }
         }
 
         return {
           summary: parsed.summary ?? "",
           suggestions,
-          savedCount: savedCount.count,
+          savedCount: savedCount,
           callsUsed: usage.callCount,
           callsRemaining: usage.limit - usage.callCount,
         };

@@ -272,6 +272,12 @@ export async function getTradeSuggestions(userId: number): Promise<TradeSuggesti
     .orderBy(desc(tradeSuggestions.annualizedYield));
 }
 
+export async function clearTradeSuggestions(userId: number): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(tradeSuggestions).where(eq(tradeSuggestions.userId, userId));
+}
+
 export async function insertTradeSuggestion(userId: number, suggestion: Omit<TradeSuggestions, "id" | "userId" | "createdAt">) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
