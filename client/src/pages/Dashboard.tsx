@@ -7,7 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { trpc } from "@/lib/trpc";
-import { TrendingUp, Target, AlertCircle, DollarSign, Activity, CheckCircle, Upload, ArrowRight, Sparkles } from "lucide-react";
+import { TrendingUp, Target, AlertCircle, DollarSign, Activity, CheckCircle, Upload, ArrowRight, Sparkles, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { LineChart, Line, BarChart, Bar, PieChart as RechartsChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
@@ -128,7 +128,11 @@ export default function Dashboard() {
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-sm text-muted-foreground mb-1">Monthly Income</p>
-                <p className="text-3xl font-bold text-accent">${estimatedMonthlyIncome.toLocaleString("en-US", { maximumFractionDigits: 0 })}</p>
+                {suggestionsQuery.isLoading ? (
+                  <Loader2 className="h-7 w-7 animate-spin text-accent/50 my-1" />
+                ) : (
+                  <p className="text-3xl font-bold text-accent">${estimatedMonthlyIncome.toLocaleString("en-US", { maximumFractionDigits: 0 })}</p>
+                )}
                 <p className="text-sm text-muted-foreground mt-2">From open positions</p>
               </div>
               <TrendingUp className="h-8 w-8 text-accent/30" />
@@ -388,7 +392,12 @@ export default function Dashboard() {
           <div className="space-y-4">
             <Card className="card-elegant">
               <h3 className="text-lg font-bold mb-4">Trade Suggestions ({suggestions.length})</h3>
-              {suggestions.length > 0 ? (
+              {suggestionsQuery.isLoading || holdingsQuery.isLoading ? (
+                <div className="flex flex-col items-center gap-2 py-8 text-center">
+                  <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                  <p className="text-sm text-muted-foreground">Loading...</p>
+                </div>
+              ) : suggestions.length > 0 ? (
                 <div className="space-y-3">
                   {suggestions.slice(0, 5).map((s) => (
                     <div key={s.id} className="p-3 border border-border rounded-lg hover:bg-muted/50 transition-colors">
@@ -408,8 +417,8 @@ export default function Dashboard() {
               ) : (
                 <div className="flex flex-col items-center gap-3 py-8 text-center">
                   <p className="text-sm text-muted-foreground">No trade suggestions yet</p>
-                  {holdingsQuery.isLoading || holdings.length === 0 ? (
-                    <Button size="sm" variant="outline" onClick={() => setLocation("/upload")} disabled={holdingsQuery.isLoading}>
+                  {holdings.length === 0 ? (
+                    <Button size="sm" variant="outline" onClick={() => setLocation("/upload")}>
                       <Upload className="mr-1.5 h-3.5 w-3.5" /> Upload Portfolio First
                     </Button>
                   ) : (
@@ -419,8 +428,9 @@ export default function Dashboard() {
                       onClick={() => analyzeAiM.mutate()}
                       disabled={analyzeAiM.isPending}
                     >
-                      <Sparkles className="mr-1.5 h-3.5 w-3.5" />
-                      {analyzeAiM.isPending ? "Generating..." : "Generate AI Suggestions"}
+                      {analyzeAiM.isPending
+                        ? <><Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> Generating...</>
+                        : <><Sparkles className="mr-1.5 h-3.5 w-3.5" /> Generate AI Suggestions</>}
                     </Button>
                   )}
                 </div>
