@@ -186,7 +186,7 @@ export default function GoalSetup() {
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold gradient-text mb-2">Income Engine Setup</h1>
+          <h1 className="text-4xl font-bold gradient-text mb-2">PremiaOpts — Goal Setup</h1>
           <p className="text-muted-foreground">Configure your investment goals and preferences</p>
         </div>
 

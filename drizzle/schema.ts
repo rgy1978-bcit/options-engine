@@ -1,4 +1,4 @@
-import { integer, pgEnum, pgTable, text, timestamp, varchar, boolean, serial } from "drizzle-orm/pg-core";
+import { integer, pgEnum, pgTable, text, timestamp, varchar, boolean, serial, numeric } from "drizzle-orm/pg-core";
 
 export const roleEnum = pgEnum("role", ["user", "admin"]);
 export const riskToleranceEnum = pgEnum("riskTolerance", ["conservative", "balanced", "aggressive"]);
@@ -42,7 +42,7 @@ export const portfolioHoldings = pgTable("portfolioHoldings", {
   id: serial("id").primaryKey(),
   userId: integer("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
   ticker: varchar("ticker", { length: 10 }).notNull(),
-  shares: integer("shares").notNull(),
+  shares: numeric("shares", { precision: 10, scale: 4 }).notNull(),
   averageCost: integer("averageCost").notNull(),
   currentPrice: integer("currentPrice").notNull(),
   purchaseDate: timestamp("purchaseDate"),
