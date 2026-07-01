@@ -12,4 +12,16 @@ export const ENV = {
   supabaseServiceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY ?? "",
   geminiApiKey: process.env.GEMINI_API_KEY ?? "",
   fmpApiKey: process.env.FMP_API_KEY ?? "",
+  // Polygon.io — free tier gives 15-min delayed stock quotes (no options on free tier).
+  // Paid starter plan ($29/mo) unlocks real-time data + full options chains.
+  // Current role: stock quote fallback (FMP → Polygon → Yahoo).
+  polygonApiKey: process.env.POLYGON_API_KEY ?? "",
+  // Alpaca Markets — NOT yet implemented beyond a broker-type enum stub.
+  // To build: get keys from alpaca.markets, fill these in, then wire the
+  // broker connection OAuth flow in routers.ts.
+  alpacaApiKey: process.env.ALPACA_API_KEY ?? "",
+  alpacaApiSecret: process.env.ALPACA_API_SECRET ?? "",
+  // Alpha Vantage — keys available but intentionally NOT used.
+  // Alpha Vantage has no options chains, no IV, no Greeks — equity price
+  // history only. FMP is the correct tool for an options income app.
 };

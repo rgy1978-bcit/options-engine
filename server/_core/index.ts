@@ -7,6 +7,7 @@ import { registerOAuthRoutes } from "./oauth";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
+import { startDailyCron } from "../cron";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -63,3 +64,6 @@ async function startServer() {
 }
 
 startServer().catch(console.error);
+
+// Start background jobs after the server is up
+startDailyCron();
