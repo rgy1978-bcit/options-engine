@@ -159,7 +159,12 @@ export default function Dashboard() {
                 <h2 className="text-xl font-bold mb-1">Monthly Income Goal</h2>
                 <p className="text-muted-foreground">Progress toward your target</p>
               </div>
-              <Target className="h-6 w-6 text-primary/30" />
+              <button
+                onClick={() => setLocation("/setup")}
+                className="flex items-center gap-1 text-xs text-primary/70 hover:text-primary transition-colors"
+              >
+                Edit Goals <ArrowRight className="h-3 w-3" />
+              </button>
             </div>
             <div className="space-y-2">
               <div className="flex justify-between">

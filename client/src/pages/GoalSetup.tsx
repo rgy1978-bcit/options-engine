@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback, memo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -7,7 +7,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
-import { ChevronRight, CheckCircle, Download, Upload, Plus, Trash2 } from "lucide-react";
+import { ChevronRight, CheckCircle, Download, Upload, Plus, Trash2, ArrowLeft } from "lucide-react";
 import { useLocation } from "wouter";
 import Papa from "papaparse";
 
@@ -37,6 +37,47 @@ interface PortfolioHolding {
   purchaseDate?: string;
   sector?: string;
 }
+
+const STRATEGY_OPTIONS = [
+  { id: "covered_calls", label: "Covered Calls", desc: "Sell calls against shares you own" },
+  { id: "cash_secured_puts", label: "Cash Secured Puts", desc: "Sell puts backed by cash reserves" },
+  { id: "wheel", label: "Wheel Strategy", desc: "Combine puts and calls for continuous income" },
+];
+
+const StrategiesStep = memo(function StrategiesStep({
+  preferredStrategies,
+  toggleStrategy,
+}: {
+  preferredStrategies: string[];
+  toggleStrategy: (s: string) => void;
+}) {
+  return (
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-2xl font-bold mb-2">Preferred Strategies</h2>
+        <p className="text-muted-foreground">Which options strategies interest you most?</p>
+      </div>
+      <div className="space-y-3">
+        {STRATEGY_OPTIONS.map((strategy) => (
+          <div
+            key={strategy.id}
+            className="flex items-center space-x-3 p-4 border border-border rounded-lg hover:bg-muted/50 cursor-pointer transition-colors"
+          >
+            <Checkbox
+              id={strategy.id}
+              checked={preferredStrategies.includes(strategy.id)}
+              onCheckedChange={() => toggleStrategy(strategy.id)}
+            />
+            <Label htmlFor={strategy.id} className="flex-1 cursor-pointer">
+              <span className="font-semibold">{strategy.label}</span>
+              <p className="text-sm text-muted-foreground">{strategy.desc}</p>
+            </Label>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+});
 
 export default function GoalSetup() {
   const [step, setStep] = useState<Step>("account");
@@ -107,14 +148,14 @@ export default function GoalSetup() {
     }
   };
 
-  const toggleStrategy = (strategy: string) => {
+  const toggleStrategy = useCallback((strategy: string) => {
     setFormData((prev) => ({
       ...prev,
       preferredStrategies: prev.preferredStrategies.includes(strategy)
         ? prev.preferredStrategies.filter((s) => s !== strategy)
         : [...prev.preferredStrategies, strategy],
     }));
-  };
+  }, []);
 
   const downloadTemplate = () => {
     const link = document.createElement("a");
@@ -196,6 +237,13 @@ export default function GoalSetup() {
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="mb-8">
+          <button
+            onClick={() => setLocation("/dashboard")}
+            className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground mb-4 transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to Dashboard
+          </button>
           <h1 className="text-4xl font-bold gradient-text mb-2">PremiaOpts — Goal Setup</h1>
           <p className="text-muted-foreground">Configure your investment goals and preferences</p>
         </div>
@@ -284,7 +332,8 @@ export default function GoalSetup() {
                   <Input
                     id="income"
                     type="number"
-                    value={formData.monthlyIncomeGoal}
+                    value={formData.monthlyIncomeGoal || ""}
+                    onFocus={(e) => e.target.select()}
                     onChange={(e) =>
                       setFormData((prev) => ({
                         ...prev,
@@ -354,38 +403,10 @@ export default function GoalSetup() {
 
           {/* Strategies Step */}
           {step === "strategies" && (
-            <div className="space-y-6">
-              <div>
-                <h2 className="text-2xl font-bold mb-2">Preferred Strategies</h2>
-                <p className="text-muted-foreground">Which options strategies interest you most?</p>
-              </div>
-              <div className="space-y-3">
-                {[
-                  { id: "covered_calls", label: "Covered Calls", desc: "Sell calls against shares you own" },
-                  {
-                    id: "cash_secured_puts",
-                    label: "Cash Secured Puts",
-                    desc: "Sell puts backed by cash reserves",
-                  },
-                  { id: "wheel", label: "Wheel Strategy", desc: "Combine puts and calls for continuous income" },
-                ].map((strategy) => (
-                  <div
-                    key={strategy.id}
-                    className="flex items-center space-x-3 p-4 border border-border rounded-lg hover:bg-muted/50 cursor-pointer transition-colors"
-                  >
-                    <Checkbox
-                      id={strategy.id}
-                      checked={formData.preferredStrategies.includes(strategy.id)}
-                      onCheckedChange={() => toggleStrategy(strategy.id)}
-                    />
-                    <Label htmlFor={strategy.id} className="flex-1 cursor-pointer">
-                      <span className="font-semibold">{strategy.label}</span>
-                      <p className="text-sm text-muted-foreground">{strategy.desc}</p>
-                    </Label>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <StrategiesStep
+              preferredStrategies={formData.preferredStrategies}
+              toggleStrategy={toggleStrategy}
+            />
           )}
 
           {/* Capital Exposure Step */}
@@ -406,7 +427,8 @@ export default function GoalSetup() {
                   <Input
                     id="capital"
                     type="number"
-                    value={formData.maxCapitalExposure}
+                    value={formData.maxCapitalExposure || ""}
+                    onFocus={(e) => e.target.select()}
                     onChange={(e) =>
                       setFormData((prev) => ({
                         ...prev,
