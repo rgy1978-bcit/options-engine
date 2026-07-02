@@ -16,9 +16,9 @@ export const ENV = {
   // Paid starter plan ($29/mo) unlocks real-time data + full options chains.
   // Current role: stock quote fallback (FMP → Polygon → Yahoo).
   polygonApiKey: process.env.POLYGON_API_KEY ?? "",
-  // Alpaca Markets — NOT yet implemented beyond a broker-type enum stub.
-  // To build: get keys from alpaca.markets, fill these in, then wire the
-  // broker connection OAuth flow in routers.ts.
+  // Alpaca Markets — used as third-tier stock quote fallback (FMP → Polygon → Alpaca → Yahoo).
+  // Free/paper accounts: 15-min delayed data. Live brokerage accounts: real-time, no extra cost.
+  // Future: Alpaca's order execution API could let users place trades directly from PremiaOpts.
   alpacaApiKey: process.env.ALPACA_API_KEY ?? "",
   alpacaApiSecret: process.env.ALPACA_API_SECRET ?? "",
   // Alpha Vantage — keys available but intentionally NOT used.
