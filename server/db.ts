@@ -405,6 +405,21 @@ export async function checkAndIncrementAiUsage(userId: number, dailyLimit: numbe
   return { allowed: true, callCount: current + 1, limit: dailyLimit };
 }
 
+/**
+ * Returns all userIds who have at least one portfolio holding AND investor
+ * goals configured. Used by the daily cron to know who to generate
+ * suggestions for.
+ */
+export async function getUsersWithHoldingsAndGoals(): Promise<number[]> {
+  const db = await getDb();
+  if (!db) return [];
+  const rows = await db
+    .selectDistinct({ userId: portfolioHoldings.userId })
+    .from(portfolioHoldings)
+    .innerJoin(investorGoals, eq(portfolioHoldings.userId, investorGoals.userId));
+  return rows.map((r) => r.userId);
+}
+
 export async function getAiUsageToday(userId: number): Promise<number> {
   const db = await getDb();
   if (!db) return 0;
